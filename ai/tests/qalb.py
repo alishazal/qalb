@@ -82,7 +82,7 @@ def train():
   """Run a loop that continuously trains the model."""
   print("Building dynamic character-level QALB data...", flush=True)
   dataset = QALB(
-    'QALB', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+    'ldc', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
     shuffle=True, max_input_length=FLAGS.max_sentence_length,
     max_label_length=FLAGS.max_sentence_length)
   
@@ -244,7 +244,7 @@ def decode():
     
   print("Building dynamic character-level QALB data...", flush=True)
   dataset = QALB(
-    'QALB', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+    'ldc', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
     max_input_length=max_length, max_label_length=max_length)
   
   print("Building computational graph...", flush=True)

@@ -65,12 +65,13 @@ class QALB(BaseDataset):
     self.max_label_length = max_label_length
     self.parse_repeated = parse_repeated
     self.extension = extension
-    data_dir = os.path.join('ai', 'datasets', 'data', 'qalb')
+    data_dir = os.path.join('ai', 'datasets', 'data', 'arabizi')
     # Prepare training data
     train_input_path = os.path.join(
-      data_dir, self.file_root + '.train.' + self.extension)
+      data_dir, self.file_root + '-train.' + self.extension)
+    print("Training input path is:", train_input_path)
     train_labels = self.maybe_flatten_gold(
-      os.path.join(data_dir, self.file_root + '.train'))
+      os.path.join(data_dir, self.file_root + '-train'))
     with io.open(train_input_path, encoding='utf-8') as train_file:
       self.train_pairs = self.make_pairs(train_file.readlines(), train_labels)
     # Lock the addition of new characters into the data-- this way, we simulate
@@ -78,9 +79,10 @@ class QALB(BaseDataset):
     self.max_types = self.num_types()
     # Prepare validation data
     valid_input_path = os.path.join(
-      data_dir, self.file_root + '.dev.' + self.extension)
+      data_dir, self.file_root + '-dev.' + self.extension)
     valid_labels = self.maybe_flatten_gold(
-      os.path.join(data_dir, self.file_root + '.dev'))
+      os.path.join(data_dir, self.file_root + '-dev'))
+    print("Dev input path is:", valid_input_path)
     with io.open(valid_input_path, encoding='utf-8') as valid_file:
       self.valid_pairs = self.make_pairs(valid_file.readlines(), valid_labels)
   
