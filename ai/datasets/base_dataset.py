@@ -32,7 +32,7 @@ class BaseDataset(object):
     # '_EOS': end of string added before padding to aid the prediction process,
     # '_GO': go token added as the first decoder input for seq2seq models,
     # '_UNK': unknown token used to cover unknown types in the dataset.
-    self.ix_to_type = ['_PAD', '_EOS', '_GO', '_UNK']
+    self.ix_to_type = ['_PAD', '_EOS', '_GO', '_UNK', '<bos>', '<eos>', '<bow>', '<eow>', '<s>']
     # Allow to add any extra defaults without modifying both data structures.
     dictarg = lambda i: [self.ix_to_type[i], i]
     self.type_to_ix = dict(map(dictarg, range(len(self.ix_to_type))))

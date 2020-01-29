@@ -101,6 +101,7 @@ class QALB(BaseDataset):
        because it never flattens the system output; instead, it finds the
        minimum number of corrections that map the input into the output."""
     gold_path = file_root + '.gold'
+    print("Gold path is", gold_path)
     if not force and os.path.exists(gold_path):
       with io.open(gold_path, encoding='utf-8') as gold_file:
         return gold_file.readlines()
