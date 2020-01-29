@@ -49,7 +49,6 @@ for line in gfLines:
     line = line.split()
     for word in line:
         newGoldFile.write(word + "\n")
-        print(word)
 
 arabiziFile.close()
 goldFile.close()
