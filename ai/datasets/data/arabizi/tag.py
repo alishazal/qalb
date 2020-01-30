@@ -1,3 +1,5 @@
+# Usage: python tag.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold] [xyz.lines]
+
 import sys
 
 arabizi = sys.argv[1]
@@ -10,21 +12,22 @@ gfLines = goldFile.readlines()
 
 newArabiziFile = open(sys.argv[3], "w")
 newGoldFile = open(sys.argv[4], "w")
+linesFile = open(sys.argv[5], "w")
 
+context = int(sys.argv[6])
 
 # Making tagged version of arabizi file
 for line in afLines:
     line = line.strip()
     line = line.split()
 
+    linesFile.write(str(len(line)) + "\n")
+
     wordCtr = 0
     for word in line:
         newLine = []
 
-        # if wordCtr == 0:
-        #     newline += "<bos><bow>" + word + "<eow>"
-        
-        for i in [-2, -1, 0, 1, 2]:
+        for i in list(range(-context, context+1)):
             if wordCtr + i >= 0 and wordCtr + i < len(line):
                 if wordCtr + i  == 0:
                     newLine.append("<bos>")
@@ -54,3 +57,4 @@ arabiziFile.close()
 goldFile.close()
 newArabiziFile.close()
 newGoldFile.close()
+linesFile.close()
