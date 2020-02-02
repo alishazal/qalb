@@ -147,7 +147,7 @@ module load cuda/8.0
 module load gcc/4.9.3
 source activate capstone-gpu
 
-python -m ai.tests.qalb-debugged --model_name=arabizi-max-length-30 --max_sentence_length=30 --extension=arabizi --output_path=output/arabizi-max-length-30
+
 python -m ai.tests.qalb-debugged --model_name=arabizi-max-length-30 --max_sentence_length=30 --decode=ai/datasets/data/arabizi/ldc-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/arabizi-max-length-30/decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/arabizi-max-length-30/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold ai/datasets/data/arabizi/ldc-dev.arabizi 30
 

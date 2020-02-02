@@ -9,7 +9,7 @@ from ai.models import BaseModel
 class CharSeq2Seq(BaseModel):
   
   def __init__(self, num_types=0, max_encoder_length=99, max_decoder_length=99,
-               pad_id=0, eos_id=1, go_id=2, bos_id=4, eos_tag_id=5, bow_id=6, eow_id=7, s_id=8,
+               pad_id=0, eos_id=1, go_id=2,
                batch_size=32, embedding_size=32, hidden_size=256, rnn_layers=2,
                bidirectional_encoder=False, bidirectional_mode='add',
                use_lstm=False, attention=None, dropout=1., max_grad_norm=5.,
