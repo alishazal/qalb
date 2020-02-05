@@ -1,4 +1,4 @@
-# Usage: python tag.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold] [xyz.lines]
+# Usage: python tag.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold] [xyz.lines] [context_number]
 
 import sys
 
@@ -35,7 +35,7 @@ for line in afLines:
                 if i == 0:
                     newLine.extend(["<bow>", word, "<eow>"])
                 elif len(newLine) != 0 and newLine[-1] not in ["<bow>", "<eow>", "<bos>", "<eos>"]:
-                    newLine.extend(["<s>", line[wordCtr + i]])
+                    newLine.extend([" ", line[wordCtr + i]])
                 else:
                     newLine.append(line[wordCtr + i])
 

@@ -159,3 +159,8 @@ arabizi_40: 26.7%
 arabizi_30: 28.78%
 arabizi_20: 30.72%
 arabizi_10: 42.79%
+
+------- Working on Feb 6 -------
+python tag.py ldc-train.arabizi ldc-train.gold ldc-tagged-train.arabizi ldc-tagged-train.gold ldc-train.lines 2
+python tag.py ldc-dev.arabizi ldc-dev.gold ldc-tagged-dev.arabizi ldc-tagged-dev.gold ldc-dev.lines 2
+python -m ai.tests.qalb-debugged --model_name=test --extension=arabizi --output_path=output/test

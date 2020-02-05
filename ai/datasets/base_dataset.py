@@ -32,22 +32,43 @@ class BaseDataset(object):
     # '_EOS': end of string added before padding to aid the prediction process,
     # '_GO': go token added as the first decoder input for seq2seq models,
     # '_UNK': unknown token used to cover unknown types in the dataset.
-    self.ix_to_type = ['_PAD', '_EOS', '_GO', '_UNK', '<bos>', '<eos>', '<bow>', '<eow>', '<s>']
+    self.ix_to_type = ['_PAD', '_EOS', '_GO', '_UNK', '<bos>', '<eos>', '<bow>', '<eow>', '<spa>']
     # Allow to add any extra defaults without modifying both data structures.
     dictarg = lambda i: [self.ix_to_type[i], i]
     self.type_to_ix = dict(map(dictarg, range(len(self.ix_to_type))))
   
+  def taggedInput(self, input_list):
+    """ Converts the input into a list that has tags seperate from normal characters
+    Example: input of "<bos><bow>mnfukha<eow>shwaya<spa>walahy<eos>" would be converted to
+    ['<bos>', '<bow>', 'm', 'n', 'f', 'u', 'k', 'h', 'a', '<eow>', 's', 'h', 'w', 'a', 'y', 'a', 
+    '<spa>', 'w', 'a', 'l', 'a', 'h', 'y', '<eos>']
+    """
+    tags = ['<bos>', '<eos>', '<bow>', '<eow>', '<spa>']
+    line = []
+    
+    i = 0
+    while i < len(input_list):
+        if input_list[i] == "<" and input_list[i:i+5] in tags:
+            line.append(input_list[i:i+5])
+            i += 5
+        else:
+            line.append(input_list[i])
+            i += 1
+
+    return line
+
   def tokenize(self, input_list):
     """Converts the argument list or string to a list of integer tokens, each
        representing a unique type. If the charachter is not registered, it will
        be added to the `type_to_ix` and `ix_to_type` attributes."""
+
+    input_list = self.taggedInput(input_list)
+
     result = []
     for i in range(len(input_list) - (self.gram_order - 1)):
 
-      
-
       gram = tuple(input_list[i:i+self.gram_order])  # lists are unhashable
-      
+
       if gram not in self.type_to_ix:
         if not self.max_types or self.num_types() < self.max_types:
           self.type_to_ix[gram] = len(self.ix_to_type)
@@ -56,6 +77,7 @@ class BaseDataset(object):
           gram = '_UNK'  # pylint: disable=redefined-variable-type
       result.append(self.type_to_ix[gram])
     return result
+
   
   def clean(self, tokens):
     """Remove the _EOS token and everything after it, if found."""
