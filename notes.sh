@@ -208,7 +208,7 @@ python -m ai.tests.qalb-debugged ldc-4-tagged --model_name=tagged-4 --max_senten
 python -m ai.tests.qalb-debugged ldc-4-tagged --model_name=tagged-4 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-4-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-4/decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/tagged-4/decoder_dev.out ai/datasets/data/arabizi/ldc-4-tagged-dev.gold
 
-script 1: tagged-6.sh
+script 2: tagged-6.sh
 #!/bin/bash
 #SBATCH --gres=gpu:1
 #SBATCH -p nvidia
