@@ -163,7 +163,31 @@ arabizi_10: 42.79%
 ------- Working on Feb 6 -------
 python tag.py ldc-train.arabizi ldc-train.gold ldc-tagged-train.arabizi ldc-tagged-train.gold ldc-train.lines 2
 python tag.py ldc-dev.arabizi ldc-dev.gold ldc-tagged-dev.arabizi ldc-tagged-dev.gold ldc-dev.lines 2
-python -m ai.tests.qalb-debugged --model_name=test --extension=arabizi --output_path=output/test
+
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=12:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+python -m ai.tests.qalb-debugged --model_name=tagged --max_sentence_length=100 --extension=arabizi --output_path=output/tagged
+python -m ai.tests.qalb-debugged --model_name=tagged --max_sentence_length=100 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged/decoder_dev.out
+
+
+------- Working on Feb 7 -------
+python tag.py ldc-train.arabizi ldc-train.gold ldc-4-tagged-train.arabizi ldc-4-tagged-train.gold ldc-4-train.lines 4
+python tag.py ldc-dev.arabizi ldc-dev.gold ldc-4-tagged-dev.arabizi ldc-4-tagged-dev.gold ldc-4-dev.lines 4
+
+python tag.py ldc-train.arabizi ldc-train.gold ldc-6-tagged-train.arabizi ldc-6-tagged-train.gold ldc-6-train.lines 6
+python tag.py ldc-dev.arabizi ldc-dev.gold ldc-6-tagged-dev.arabizi ldc-6-tagged-dev.gold ldc-6-dev.lines 6
 
 #!/bin/bash
 #SBATCH --gres=gpu:1

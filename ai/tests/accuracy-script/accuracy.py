@@ -1,42 +1,40 @@
-# import sys
+# Usage python accuracy.py [system-pred.out] [something.gold]
 
-# systemOutput = sys.argv[1]
-# gold = sys.argv[2]
-# arabizi = sys.argv[3]
-# maxLength = int(sys.argv[4])
+import sys
 
-# systemOutputfile = open(systemOutput, "r")
-# soLines = systemOutputfile.readlines()
+systemOutput = sys.argv[1]
+systemOutputfile = open(systemOutput, "r")
+soLines = systemOutputfile.readlines()
 
-# goldFile = open(gold, "r")
-# gfLines = goldFile.readlines()
+gold = sys.argv[2]
+goldFile = open(gold, "r")
+gfLines = goldFile.readlines()
 
-# arabiziFile = open(arabizi, "r")
-# afLines = arabiziFile.readlines()
+correct = 0
+total = 0
 
-# correct = 0
-# total = 0
+correctDict = {}
+wrongDict = {}
 
-# soCount = 0
-# for i in range(len(afLines)):
-#     if len(afLines[i]) > maxLength:
-#         continue
-    
-#     currSysSentence = soLines[soCount].split()
-#     currGoldSentence = gfLines[i].split()
+for i in range(len(soLines)):
+    if soLines[i] == gfLines[i]:
+        correct += 1
+        if len(soLines[i]) in correctDict:
+            correctDict[len(soLines[i])] += 1
+        else:
+            correctDict[len(soLines[i])] = 1
+    else:
+        if len(soLines[i]) in wrongDict:
+            wrongDict[len(soLines[i])] += 1
+        else:
+            wrongDict[len(soLines[i])] = 1
+    total += 1
 
-#     soCount += 1
+# print(correctDict)
+# print(wrongDict)
+print("Correct lines are", correct)
+print("Total lines are", total)
+print("Accuracy is:", (correct/total)*100)
 
-#     if len(currGoldSentence) != len(currSysSentence):
-#         continue
-
-#     for j in range(len(currGoldSentence)):
-#         if currGoldSentence[j] == currSysSentence[j]:
-#             correct += 1
-#         total += 1
-
-# print("Accuracy is:", (correct/total)*100)
-
-# systemOutputfile.close()
-# goldFile.close()
-# arabiziFile.close()
+systemOutputfile.close()
+goldFile.close()

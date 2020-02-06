@@ -2,6 +2,7 @@
 
 import io
 import os
+import sys
 import re
 import timeit
 
@@ -13,6 +14,7 @@ from scipy.special import lambertw
 from ai.datasets import QALB
 from ai.models import Seq2Seq
 
+file = sys.argv[1]
 
 # HYPERPARAMETERS
 tf.app.flags.DEFINE_float('lr', 5e-4, "Initial learning rate.")
@@ -82,7 +84,7 @@ def train():
   """Run a loop that continuously trains the model."""
   print("Building dynamic character-level QALB data...", flush=True)
   dataset = QALB(
-    'ldc-tagged', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+    file, parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
     shuffle=True, max_input_length=FLAGS.max_sentence_length,
     max_label_length=FLAGS.max_sentence_length)
   
@@ -246,7 +248,7 @@ def decode():
     
   print("Building dynamic character-level QALB data...", flush=True)
   dataset = QALB(
-    'ldc-tagged', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+    file, parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
     max_input_length=max_length, max_label_length=max_length)
   
   print("Building computational graph...", flush=True)
