@@ -242,7 +242,6 @@ def decode():
   with io.open(FLAGS.decode, encoding='utf-8') as test_file:
     lines = test_file.readlines()
     # Get the largest sentence length to set an upper bound to the decoder.
-    print("MAX LENGTH FLAG:", FLAGS.max_sentence_length)
     max_length = FLAGS.max_sentence_length
     # max_length = max([len(line) for line in lines])
     
@@ -283,8 +282,6 @@ def decode():
         ids = dataset.tokenize(line)
         while len(ids) < max_length:
           ids.append(dataset.type_to_ix['_PAD'])
-        print("LINE IS", line.strip("\n"))
-        print("LENGTH OF LINE IS", len(line))
         outputs = sess.run(m.generative_output, feed_dict={m.inputs: [ids]})
         top_line = untokenize_batch(dataset, outputs)[0]
         # Sequences of text will only be repeated up to 5 times.
