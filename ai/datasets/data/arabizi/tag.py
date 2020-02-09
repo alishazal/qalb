@@ -42,7 +42,10 @@ for line in afLines:
                 if wordCtr + i == len(line) - 1:
                     newLine.append("<eos>")
 
-        strLine = ''.join(newLine) + "\n"
+        if context == 1:
+            strLine = ''.join(newLine) + " " + "\n"
+        else:
+            strLine = ''.join(newLine) + "\n"
         newArabiziFile.write(strLine)
         wordCtr += 1
 
