@@ -226,3 +226,44 @@ source activate capstone-gpu
 python -m ai.tests.qalb-debugged ldc-6-tagged --model_name=tagged-6 --max_sentence_length=180 --extension=arabizi --output_path=output/tagged-6
 python -m ai.tests.qalb-debugged ldc-6-tagged --model_name=tagged-6 --max_sentence_length=180 --decode=ai/datasets/data/arabizi/ldc-6-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-6/decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/tagged-6/decoder_dev.out ai/datasets/data/arabizi/ldc-6-tagged-dev.gold
+
+
+------- Working on Feb 10 -------
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=24:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+python -m ai.tests.qalb-debugged ldc-4-tagged --model_name=tagged-4 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-4-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-4/decoder_dev.out
+python -m ai.tests.qalb-debugged ldc-6-tagged --model_name=tagged-6 --max_sentence_length=180 --decode=ai/datasets/data/arabizi/ldc-6-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-6/decoder_dev.out
+
+
+python tag.py ldc-train.arabizi ldc-train.gold ldc-1-tagged-train.arabizi ldc-1-tagged-train.gold ldc-1-train.lines 1
+python tag.py ldc-dev.arabizi ldc-dev.gold ldc-1-tagged-dev.arabizi ldc-1-tagged-dev.gold ldc-1-dev.lines 1
+
+script 1: tagged-1.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=24:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+python -m ai.tests.qalb-debugged ldc-1-tagged --model_name=tagged-1 --max_sentence_length=150 --extension=arabizi --output_path=output/tagged-1
+python -m ai.tests.qalb-debugged ldc-1-tagged --model_name=tagged-1 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-1/decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/tagged-1/decoder_dev.out ai/datasets/data/arabizi/ldc-1-tagged-dev.gold
