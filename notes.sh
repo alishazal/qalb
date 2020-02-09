@@ -271,7 +271,7 @@ python ai/tests/accuracy-script/accuracy.py output/tagged-1/decoder_dev.out ai/d
 python no-context.py ldc-train.arabizi ldc-train.gold ldc-0-tagged-train.arabizi ldc-0-tagged-train.gold
 python no-context.py ldc-dev.arabizi ldc-dev.gold ldc-0-tagged-dev.arabizi ldc-0-tagged-dev.gold
 
-script 1: tagged-1.sh
+script 2: tagged-0.sh
 #!/bin/bash
 #SBATCH --gres=gpu:1
 #SBATCH -p nvidia
@@ -286,6 +286,6 @@ module load cuda/8.0
 module load gcc/4.9.3
 source activate capstone-gpu
 
-python -m ai.tests.qalb-debugged ldc-1-tagged --model_name=tagged-1 --max_sentence_length=150 --extension=arabizi --output_path=output/tagged-1
-python -m ai.tests.qalb-debugged ldc-1-tagged --model_name=tagged-1 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-1/decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1/decoder_dev.out ai/datasets/data/arabizi/ldc-1-tagged-dev.gold
+python -m ai.tests.qalb-debugged ldc-0-tagged --model_name=tagged-0 --max_sentence_length=80 --extension=arabizi --output_path=output/tagged-0
+python -m ai.tests.qalb-debugged ldc-0-tagged --model_name=tagged-0 --max_sentence_length=80 --decode=ai/datasets/data/arabizi/ldc-0-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-0/decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/tagged-0/decoder_dev.out ai/datasets/data/arabizi/ldc-0-tagged-dev.gold
