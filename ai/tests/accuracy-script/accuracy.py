@@ -30,8 +30,8 @@ for i in range(len(soLines)):
             wrongDict[len(soLines[i])] = 1
     total += 1
 
-# print(correctDict)
-# print(wrongDict)
+print("Correct dictionary:", correctDict)
+print("Incorrect dictionary:", wrongDict)
 print("Correct lines are", correct)
 print("Total lines are", total)
 print("Accuracy is:", (correct/total)*100)
