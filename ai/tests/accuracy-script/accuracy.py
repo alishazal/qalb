@@ -34,7 +34,7 @@ print("Correct dictionary:", correctDict)
 print("Incorrect dictionary:", wrongDict)
 print("Correct lines are", correct)
 print("Total lines are", total)
-print("Accuracy is:", (correct/total)*100)
+print("Accuracy is:", ((correct/total)*100))
 
 systemOutputfile.close()
 goldFile.close()
