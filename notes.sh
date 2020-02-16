@@ -743,71 +743,71 @@ Checking sentence level accuracy:
 script 1: sentence-level-accuracies.sh
 echo "Contexts 1, 2, 3, 4, 6"
 python ai/datasets/data/arabizi/join.py output/tagged-1/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-2/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-2/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-2/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-2/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-3/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-3/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-3/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-3/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-4/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-4/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-4/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-4/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-6/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-6/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-6/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-6/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 echo "Batch sizes 64, 256, 512, 1024, 2048"
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-64/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-64/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-64/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-64/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-256/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-256/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-256/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-256/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-512/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-512/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-512/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-512/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-2048/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-2048/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-2048/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-2048/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 echo "RNNs 1, 2, 3, 4, 5"
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-1/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-1/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-1/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-1/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-3/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-3/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-3/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-3/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-4/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-4/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-4/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-4/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-5/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-5/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-5/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-5/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 echo "Embedding sizes 64, 256, 512"
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-64/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-64/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-64/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-64/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-512/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-512/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-512/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-512/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 echo "Learning rates 0.005, 0.0001, 0.00001, 0.00005"
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.005/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.005/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.005/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.005/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00001/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00001/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00001/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00001/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00005/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00005/final_decoder_dev.out
-python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00005/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00005/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
