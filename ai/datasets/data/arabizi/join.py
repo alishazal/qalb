@@ -1,4 +1,6 @@
-# Usage: python join.py [sysPred.out] [xyz.lines] [finalPred.out]
+"""
+Usage: python join.py [sysPred.out] [xyz.lines] [finalPred.out]
+"""
 
 import sys
 

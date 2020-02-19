@@ -1,4 +1,6 @@
-# Usage: python no-context.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold]
+"""
+Usage: python no-context.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold]
+"""
 
 import sys
 

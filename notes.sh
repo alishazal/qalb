@@ -740,7 +740,16 @@ python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2
 ------- Working on Feb 16 -------
 Checking sentence level accuracy:
 
-script 1: sentence-level-accuracies.sh
+script 1: sentence-level-accuracies-till-lr.sh
+#!/bin/bash
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+module purge
+module load anaconda/2-4.1.1
+source activate capstone
+
 echo "Contexts 1, 2, 3, 4, 6"
 python ai/datasets/data/arabizi/join.py output/tagged-1/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1/final_decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/tagged-1/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
@@ -811,3 +820,431 @@ python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2
 
 python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00005/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00005/final_decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.00005/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=64 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64 --max_sentence_length=150 --extension=arabizi --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=64 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64/final_decoder_dev.out
+echo "\nWord level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64/decoder_dev.out ai/datasets/data/arabizi/ldc-1-tagged-dev.gold word
+echo "Sentence level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-64/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=128 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128 --max_sentence_length=150 --extension=arabizi --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=128 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128/final_decoder_dev.out
+echo "\nWord level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128/decoder_dev.out ai/datasets/data/arabizi/ldc-1-tagged-dev.gold word
+echo "Sentence level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-128/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=512 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512 --max_sentence_length=150 --extension=arabizi --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=512 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512/final_decoder_dev.out
+echo "\nWord level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512/decoder_dev.out ai/datasets/data/arabizi/ldc-1-tagged-dev.gold word
+echo "Sentence level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-512/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 5: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=1024 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024 --max_sentence_length=150 --extension=arabizi --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024
+python -m ai.tests.qalb-debugged ldc-1-tagged --batch_size=1024 --embedding_size=256 --lr=0.0001 --hidden_size=1024 --model_name=tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024/final_decoder_dev.out
+echo "\nWord level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024/decoder_dev.out ai/datasets/data/arabizi/ldc-1-tagged-dev.gold word
+echo "Sentence level accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-1024/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+------- Working on Feb 17 -------
+script 1: tagged-2-batchsize-1024.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+python -m ai.tests.qalb-debugged ldc-tagged --batch_size=1024 --model_name=tagged-2-batchsize-1024 --max_sentence_length=150 --extension=arabizi --output_path=output/tagged-2-batchsize-1024
+python -m ai.tests.qalb-debugged ldc-tagged --batch_size=1024 --model_name=tagged-2-batchsize-1024 --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/tagged-2-batchsize-1024/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/tagged-2-batchsize-1024/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/tagged-2-batchsize-1024/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/tagged-2-batchsize-1024/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/tagged-2-batchsize-1024/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+
+script 2: tagged-3-batchsize-1024.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-3-tagged"
+model="tagged-3-batchsize-1024"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 3: tagged-4-batchsize-1024.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-4-tagged"
+model="tagged-4-batchsize-1024"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+------- Working on Feb 18 -------
+
+script 1: tagged-6-batchsize-1024.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-6-tagged"
+model="tagged-6-batchsize-1024"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-noBidirectional.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-noBidirectional"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --bidirectional_encoder=False --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --bidirectional_encoder=False --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-bidirectional-concat.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-bidirectional-concat"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --bidirectional_mode=concat --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --bidirectional_mode=concat --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-bidirectional-project.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-bidirectional-project"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --bidirectional_mode=project --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --bidirectional_mode=project --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 5: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-04.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-04"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.4 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.4 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 6: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-05.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-05"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 7: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-07.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-07"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.7 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.7 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 8: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-08.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-08"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.8 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.8 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+------- Working on Feb 18 -------
+script 1: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-90.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-90"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=9.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=9.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+echo "Word level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+echo "Sentence level accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+
+
+script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-95.sh
+
+script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-105.sh
+
+script 5: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-110.sh

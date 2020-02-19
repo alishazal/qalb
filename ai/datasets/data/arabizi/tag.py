@@ -1,4 +1,6 @@
-# Usage: python tag.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold] [xyz.lines] [context_number]
+"""
+Usage: python tag.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold] [xyz.lines] [context_number]
+"""
 
 import sys
 
