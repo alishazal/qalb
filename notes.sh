@@ -1239,9 +1239,7 @@ python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --
 python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
 echo "Word level accuracy"
 python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
-echo "Sentence level accuracy"
-python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
-
+echo ""
 
 script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-95.sh
 
