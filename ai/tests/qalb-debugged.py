@@ -17,9 +17,9 @@ from ai.models import Seq2Seq
 file = sys.argv[1]
 
 # HYPERPARAMETERS
-tf.app.flags.DEFINE_float('lr', 5e-4, "Initial learning rate.")
-tf.app.flags.DEFINE_integer('batch_size', 128, "Batch size.")
-tf.app.flags.DEFINE_integer('embedding_size', 128, "Embedding dimensionality.")
+tf.app.flags.DEFINE_float('lr', 0.0001, "Initial learning rate.")
+tf.app.flags.DEFINE_integer('batch_size', 1024, "Batch size.")
+tf.app.flags.DEFINE_integer('embedding_size', 256, "Embedding dimensionality.")
 tf.app.flags.DEFINE_integer('hidden_size', 256, "Number of hidden units.")
 tf.app.flags.DEFINE_integer('rnn_layers', 2, "Number of RNN layers.")
 tf.app.flags.DEFINE_boolean('bidirectional_encoder', True, "Whether to use a"
@@ -29,9 +29,9 @@ tf.app.flags.DEFINE_string('bidirectional_mode', 'add', "Set to 'add',"
 tf.app.flags.DEFINE_boolean('use_lstm', False, "Set to False to use GRUs.")
 tf.app.flags.DEFINE_string('attention', 'luong', "'bahdanau' or 'luong'"
                            " (default is 'luong').")
-tf.app.flags.DEFINE_float('dropout', .6, "Keep probability for dropout on the"
+tf.app.flags.DEFINE_float('dropout', .9, "Keep probability for dropout on the"
                           "RNNs' non-recurrent connections.")
-tf.app.flags.DEFINE_float('max_grad_norm', 10., "Clip gradients to this norm.")
+tf.app.flags.DEFINE_float('max_grad_norm', 11.5, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_integer('beam_size', 5, "Beam search size.")
 tf.app.flags.DEFINE_float('initial_p_sample', .35, "Initial decoder sampling"
                           " probability (0=ground truth, 1=use predictions).")
@@ -47,13 +47,13 @@ tf.app.flags.DEFINE_float('beta1', .9, "First order moment decay.")
 tf.app.flags.DEFINE_float('beta2', .999, "Second order moment decay.")
 
 # CONFIG
-tf.app.flags.DEFINE_integer('max_sentence_length', 400, "Max. word length of"
+tf.app.flags.DEFINE_integer('max_sentence_length', 150, "Max. word length of"
                             " training examples (both inputs and labels).")
 tf.app.flags.DEFINE_integer('num_steps_per_eval', 50, "Number of steps to wait"
                             " before running the graph with the dev set.")
 tf.app.flags.DEFINE_integer('max_epochs', 30, "Number of epochs to run"
                             " (0 = no limit).")
-tf.app.flags.DEFINE_string('extension', 'mada.kmle', "Data files' extension.")
+tf.app.flags.DEFINE_string('extension', 'arabizi', "Data files' extension.")
 tf.app.flags.DEFINE_string('decode', None, "Set to a path to run on a file.")
 tf.app.flags.DEFINE_string('output_path', os.path.join('output', 'result.txt'),
                            "Name of the output file with decoding results.")

@@ -1191,7 +1191,7 @@ python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/dat
 echo "Sentence level accuracy"
 python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
 
-------- Working on Feb 18 -------
+------- Working on Feb 19 -------
 script 1: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09.sh
 #!/bin/bash
 #SBATCH --gres=gpu:1
@@ -1212,10 +1212,11 @@ model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-
 python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
 python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
 python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
-echo "Word level accuracy"
+printf "Accuracy"
 python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
-echo "Sentence level accuracy"
-python ai/tests/accuracy-script/accuracy.py output/$model/final_decoder_dev.out ai/datasets/data/arabizi/ldc-dev.gold sentence
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
 
 script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-90.sh
 #!/bin/bash
@@ -1236,13 +1237,745 @@ data="ldc-1-tagged"
 model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-90"
 python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=9.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
 python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=9.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
-python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
-echo "Word level accuracy"
+printf "Accuracy"
 python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
-echo ""
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
 
 script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-95.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-95"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=9.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=9.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
 
 script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-105.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
 
-script 5: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-110.sh
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-06-gradNorm-105"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=10.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --max_grad_norm=10.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+------- Working on Feb 20 -------
+script 1: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-10.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-10"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=1.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=1.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+python ai/datasets/data/arabizi/join.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-dev.lines output/$model/final_decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-80.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-80"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=8.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=8.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-85.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-85"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=8.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=8.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-90.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-90"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=9.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=9.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+------- Working on Feb 21 -------
+script 1: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-95.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-95"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=9.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=9.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-105.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-105"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=10.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=10.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-110.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-110"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 5: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-120.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-120"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=12.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=12.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 6: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-125.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-125"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=12.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=12.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 7: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-130.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-130"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=13.0 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=13.0 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 8: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-135.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-135"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=13.5 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=13.5 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+------- Working on Feb 22 -------
+script 1: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-010.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-010"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.10 --final_p_sample=0.10 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.10 --final_p_sample=0.10 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-020.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-020"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.20 --final_p_sample=0.20 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.20 --final_p_sample=0.20 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-040.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-040"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.40 --final_p_sample=0.40 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.40 --final_p_sample=0.40 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-050.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-050"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.50 --final_p_sample=0.50 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.50 --final_p_sample=0.50 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+------- Working on Feb 23 -------
+script 1: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-025.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-025"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.25 --final_p_sample=0.25 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.25 --final_p_sample=0.25 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-030.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-p-final-p-030"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.30 --final_p_sample=0.30 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --initial_p_sample=0.30 --final_p_sample=0.30 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+------- Working on Feb 25 -------
+script 1: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-16.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-16"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=16 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=16 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 2: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-18.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-18"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=18 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=18 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 3: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-22.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-22"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=22 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=22 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 4: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-24.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-schedule-sampling-24"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=24 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --epochs_p_sample=24 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 5: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-sigmoid-decay.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-sigmoid-decay"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --linear_p_sample=False --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --linear_p_sample=False --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 6: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-parse-repeated-1.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-parse-repeated-1"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --parse_repeated=1 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --parse_repeated=1 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 7: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-parse-repeated-2.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-parse-repeated-2"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --parse_repeated=2 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --parse_repeated=2 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 8: tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-parse-repeated-3.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115-init-final-p-035-schedule-sampling-20-parse-repeated-3"
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --parse_repeated=3 --model_name=$model --max_sentence_length=150 --extension=arabizi --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --batch_size=1024 --embedding_size=256 --lr=0.0001 --dropout=0.9 --max_grad_norm=11.5 --parse_repeated=3 --model_name=$model --max_sentence_length=150 --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --extension=arabizi --beam_size=5 --output_path=output/$model/decoder_dev.out
+printf "Accuracy"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+------- Working on Feb 27 -------
+script 1: best-system-epoch-check.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="best-system-epoch-check"
+
+for i in `seq 5 5 40`; do
+
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --output_path=output/$model
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
+    printf "\n----Epoch $i----\nAccuracy:\n" >> output/$model/results.txt
+    python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word >> output/$model/results.txt
+    printf "\nA/Y Normalized Accuracy\n" >> output/$model/results.txt
+    python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+    python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word >> output/$model/results.txt
+
+done
