@@ -31,9 +31,9 @@ for i in range(len(soLines)):
     total += 1
 
 level = sys.argv[3]
-if level == "word":
-    print("Correct dictionary:", correctDict)
-    print("Incorrect dictionary:", wrongDict)
+# if level == "word":
+#     print("Correct dictionary:", correctDict)
+#     print("Incorrect dictionary:", wrongDict)
 print("Correct lines are", correct)
 print("Total lines are", total)
 print("Accuracy is:", ((correct/total)*100))

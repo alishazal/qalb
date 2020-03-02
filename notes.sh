@@ -1979,3 +1979,82 @@ for i in `seq 5 5 40`; do
     python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word >> output/$model/results.txt
 
 done
+
+script 2: best-system-epoch-check-2.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="best-system-epoch-check-2"
+
+for i in `seq 5 5 40`; do
+
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --output_path=output/$model
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --decode=ai/datasets/data/arabizi/ldc-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
+    printf "\n----Epoch $i----\nAccuracy:\n" >> output/$model/results.txt
+    python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word >> output/$model/results.txt
+    printf "\nA/Y Normalized Accuracy\n" >> output/$model/results.txt
+    python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+    python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word >> output/$model/results.txt
+
+done
+
+------- Working on March 3 -------
+script 1: decode-with-1-tag.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115"
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-tagged-1-dev.arabizi --output_path=output/$model/decoder_dev_1_tagged.out
+printf "\nAccuracy:\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev_1_tagged.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy:\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev_1_tagged.out output/$model/normalized_decoder_dev_1_tagged.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev_1_tagged.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+
+script 2: reverse-model.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="reverse-ldc-1-tagged"
+model="reverse-model"
+
+python -m ai.tests.qalb-debugged $data --model_name=$model --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/reverse-ldc-1-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
+printf "\nAccuracy:\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/reverse-ldc-1-tagged-dev.gold word 
