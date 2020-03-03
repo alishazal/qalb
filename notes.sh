@@ -2103,3 +2103,22 @@ python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/dat
 printf "\nA/Y Normalized Accuracy:\n"
 python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 5: gen-synthetic-arabic.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=4:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="reverse-ldc-1-tagged"
+model="reverse-model"
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/MADAR-CAI.buckwalter --output_path=ai/datasets/data/arabizi/synthetic.arabizi
