@@ -2078,3 +2078,28 @@ data="ldc-1-tagged-normalized"
 model="normalized-model"
 python -m ai.tests.qalb-debugged $data --model_name=$model --output_path=output/$model
 python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-normalized-dev.arabizi --output_path=output/$model/normalized_decoder_dev.out
+
+script 4: lowercase-model.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=24:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged-lowercase"
+model="lowercase-model"
+python -m ai.tests.qalb-debugged $data --model_name=$model --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-lowercase-dev.arabizi --output_path=output/$model/decoder_dev.out
+printf "\nAccuracy:\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-1-tagged-lowercase-dev.gold word
+printf "\nA/Y Normalized Accuracy:\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
