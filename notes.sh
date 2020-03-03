@@ -2028,7 +2028,7 @@ source activate capstone-gpu
 
 data="ldc-1-tagged"
 model="tagged-1-batchsize-1024-rnn-2-embedding-256-lr-0.0001-hidden-256-dropout-09-gradNorm-115"
-python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-tagged-1-dev.arabizi --output_path=output/$model/decoder_dev_1_tagged.out
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --output_path=output/$model/decoder_dev_1_tagged.out
 printf "\nAccuracy:\n"
 python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev_1_tagged.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
 printf "\nA/Y Normalized Accuracy:\n"
@@ -2058,3 +2058,23 @@ python -m ai.tests.qalb-debugged $data --model_name=$model --output_path=output/
 python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/reverse-ldc-1-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
 printf "\nAccuracy:\n"
 python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/reverse-ldc-1-tagged-dev.gold word 
+
+script 3: normalized-model.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=24:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged-normalized"
+model="normalized-model"
+python -m ai.tests.qalb-debugged $data --model_name=$model --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-normalized-dev.arabizi --output_path=output/$model/normalized_decoder_dev.out
