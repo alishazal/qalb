@@ -2104,7 +2104,7 @@ printf "\nA/Y Normalized Accuracy:\n"
 python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
 
-script 5: gen-synthetic-arabic.sh
+script 5: gen-synthetic-arabizi.sh
 #!/bin/bash
 #SBATCH --gres=gpu:1
 #SBATCH -p nvidia
@@ -2121,4 +2121,4 @@ source activate capstone-gpu
 
 data="reverse-ldc-1-tagged"
 model="reverse-model"
-python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/MADAR-CAI.buckwalter --output_path=ai/datasets/data/arabizi/synthetic.arabizi
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/MADAR-CAI-1-tagged.buckwalter --output_path=ai/datasets/data/arabizi/synthetic.arabizi
