@@ -92,7 +92,7 @@ def train():
   graph = tf.Graph()
   
   with graph.as_default():
-    
+    tf.set_random_seed(1)
     # During training we use beam width 1. There are lots of complications on
     # the implementation, e.g. only tiling during inference.
     m = Seq2Seq(
@@ -253,7 +253,7 @@ def decode():
   print("Building computational graph...", flush=True)
   graph = tf.Graph()
   with graph.as_default():
-    
+    tf.set_random_seed(1)
     m = Seq2Seq(
       num_types=dataset.num_types(),
       max_encoder_length=max_length, max_decoder_length=max_length,
