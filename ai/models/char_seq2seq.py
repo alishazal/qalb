@@ -2,6 +2,7 @@
 
 import tensorflow as tf
 from tensorflow.python.layers.core import Dense
+tf.set_random_seed(1)
 
 from ai.models import BaseModel
 

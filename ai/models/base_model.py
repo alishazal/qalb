@@ -7,6 +7,7 @@ from abc import abstractmethod
 import os
 
 import tensorflow as tf
+tf.set_random_seed(1)
 
 from ai.utils import abstractclass
 

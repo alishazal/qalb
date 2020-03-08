@@ -1,6 +1,7 @@
 """TODO: add descriptive module docstring."""
 
 import random
+random.seed(1)
 
 from ai.utils import abstractclass
 

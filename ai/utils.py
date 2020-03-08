@@ -6,6 +6,7 @@ import re
 
 import tensorflow as tf
 from tensorflow.python.client import device_lib
+tf.set_random_seed(1)
 
 
 ### GENERAL
