@@ -2270,7 +2270,7 @@ for i in `seq 45 5 80`; do
 
 done
 
-script 3: checking_seed_1.sh
+script 3: checking_seed_1-1.sh
 #!/bin/bash
 #SBATCH --gres=gpu:1
 #SBATCH -p nvidia
@@ -2286,7 +2286,7 @@ module load gcc/4.9.3
 source activate capstone-gpu
 
 data="ldc-1-tagged"
-model="checking_seed_1"
+model="checking_seed_1-1"
 
 python -m ai.tests.qalb-debugged $data --model_name=$model --output_path=output/$model
 python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
@@ -2295,3 +2295,89 @@ python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/dat
 printf "\nA/Y Normalized Accuracy\n"
 python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
 python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 3: checking_seed_1-2.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="checking_seed_1-2"
+
+python -m ai.tests.qalb-debugged $data --model_name=$model --output_path=output/$model
+python -m ai.tests.qalb-debugged $data --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
+printf "\nAccuracy:\n"
+python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word
+printf "\nA/Y Normalized Accuracy\n"
+python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word
+
+script 4: checking_seed_2-1.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="checking_seed_2-1"
+
+for i in `seq 5 5 40`; do
+
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --output_path=output/$model
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
+    printf "\n----Epoch $i----\nAccuracy:\n" >> output/$model/results.txt
+    python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word >> output/$model/results.txt
+    printf "\nA/Y Normalized Accuracy\n" >> output/$model/results.txt
+    python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+    python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word >> output/$model/results.txt
+
+done
+
+script 5: checking_seed_2-2.sh
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=30000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+
+data="ldc-1-tagged"
+model="checking_seed_2-2"
+
+for i in `seq 5 5 40`; do
+
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --output_path=output/$model
+    python -m ai.tests.qalb-debugged $data --max_epochs=$i --model_name=$model --decode=ai/datasets/data/arabizi/ldc-1-tagged-dev.arabizi --output_path=output/$model/decoder_dev.out
+    printf "\n----Epoch $i----\nAccuracy:\n" >> output/$model/results.txt
+    python ai/tests/accuracy-script/accuracy.py output/$model/decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev.gold word >> output/$model/results.txt
+    printf "\nA/Y Normalized Accuracy\n" >> output/$model/results.txt
+    python ai/datasets/data/arabizi/ay-normalize.py output/$model/decoder_dev.out output/$model/normalized_decoder_dev.out
+    python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word >> output/$model/results.txt
+
+done

@@ -1,5 +1,5 @@
 """
-Usage: python identify-data.py [my-file] [big-corpus] [matched-file] [unmatched-file]
+Usage: python3 identify-data.py [my-file] [big-corpus] [matched-file] [unmatched-file]
 """
 
 import sys
