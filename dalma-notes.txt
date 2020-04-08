@@ -2383,7 +2383,7 @@ for i in `seq 5 5 40`; do
 done
 
 ------- Working on March 31 -------
-script 1: fasttext-arabizi-
+script 1: fasttext-ldc-source.sh
 #!/bin/bash
 #SBATCH --gres=gpu:1
 #SBATCH -p nvidia
@@ -2397,4 +2397,4 @@ module load anaconda/2-4.1.1
 module load cuda/8.0
 module load gcc/4.9.3
 source activate capstone-gpu
-./fastText/fasttext skipgram -input  -output qalb/ai/datasets/data/gigaword/fasttext_model_300_narrow -dim 300 -minn 2 -ws 2 -epoch 1
+./fastText/fasttext skipgram -input arabizi/qalb/new_splits_ldc/source/bolt-ldc-source-ml-ready.arabizi -output qalb/ai/datasets/data/gigaword/ldc_source_300_narrow -dim 300 -minn 2 -ws 2
