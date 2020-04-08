@@ -14,3 +14,5 @@ bolt_sms_chat_ara_src_transliteration/
 MADAR-Shared-Task-Subtask-1/
 old_3arrib_data_check/
 *.xml
+*.out
+*.sh

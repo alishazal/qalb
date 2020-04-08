@@ -2397,4 +2397,4 @@ module load anaconda/2-4.1.1
 module load cuda/8.0
 module load gcc/4.9.3
 source activate capstone-gpu
-./fastText/fasttext skipgram -input gigaword-5th-244.9MS.clean.tok.txt -output qalb/ai/datasets/data/gigaword/fasttext_model_300_narrow -dim 300 -minn 2 -ws 2 -epoch 1
+./fastText/fasttext skipgram -input  -output qalb/ai/datasets/data/gigaword/fasttext_model_300_narrow -dim 300 -minn 2 -ws 2 -epoch 1
