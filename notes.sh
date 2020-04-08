@@ -2381,3 +2381,20 @@ for i in `seq 5 5 40`; do
     python ai/tests/accuracy-script/accuracy.py output/$model/normalized_decoder_dev.out ai/datasets/data/arabizi/ldc-tagged-dev-ayNormalized.gold word >> output/$model/results.txt
 
 done
+
+------- Working on March 31 -------
+script 1: fasttext-arabizi-
+#!/bin/bash
+#SBATCH --gres=gpu:1
+#SBATCH -p nvidia
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=as10505
+#SBATCH --mem=60000
+#SBATCH --time=48:00:00
+module purge
+module load all
+module load anaconda/2-4.1.1
+module load cuda/8.0
+module load gcc/4.9.3
+source activate capstone-gpu
+./fastText/fasttext skipgram -input gigaword-5th-244.9MS.clean.tok.txt -output qalb/ai/datasets/data/gigaword/fasttext_model_300_narrow -dim 300 -minn 2 -ws 2 -epoch 1
