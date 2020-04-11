@@ -92,7 +92,7 @@ cat_files = ('ai/datasets/data/arabizi/ldc-ml-ready-train.{0} '
              'ai/datasets/data/arabizi/ldc-ml-ready-dev.{0} '.format(FLAGS.extension))
 
 unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
-             r"'!seen[$0]++' | ../fastText/fasttext print-word-vectors "
+             r"'!seen[$0]++' | ../../fastText/fasttext print-word-vectors "
              r"ai/datasets/data/gigaword/{}.bin") % cat_files
 
 WORD_EMBEDDINGS = []
