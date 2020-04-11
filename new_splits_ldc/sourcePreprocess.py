@@ -20,7 +20,7 @@ def isPunctuation(char, position):
         else:    
             return False
     else:
-        if char in ".,?!'\":;-()[]}{":
+        if char in ".,?!'\":;-()[]}{=":
             return True
         else:    
             return False
@@ -92,7 +92,7 @@ def separatePunctuationAndTextEmoji(word):
     
     else: # If last char is not punc (for example it is :D, :P, etc)
         #match for text emoticons like :D :-) ;) etc
-        match = re.search(r'[=:;][-\'"_.]*[OoPpsSDVv@*|/\\]+', word, re.IGNORECASE) 
+        match = re.search(r'[\\]*[=:;][-\'"_.]*[OoPpsSDVv@*|/\\]+', word, re.IGNORECASE) 
         if match:
             emoticon = match.group(0) # matched emoticon
             emoticonIndex = word.find(emoticon) # index of matched emoticon

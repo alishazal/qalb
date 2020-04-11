@@ -2,23 +2,27 @@
 
 import io
 import os
-import random
+import sys
 import re
 import timeit
+import random
 
-import numpy as np
 import tensorflow as tf
 import editdistance
+import numpy as np
+from scipy import exp
 from scipy.special import lambertw
 
 from ai.datasets import QALB
 from ai.models import CharSeq2Seq
 
+file = sys.argv[1]
+
 
 # HYPERPARAMETERS
-tf.app.flags.DEFINE_float('lr', 5e-4, "Initial learning rate.")
-tf.app.flags.DEFINE_integer('batch_size', 128, "Batch size.")
-tf.app.flags.DEFINE_integer('embedding_size', 150, "Embedding dimensionality.")
+tf.app.flags.DEFINE_float('lr', 0.0001, "Initial learning rate.")
+tf.app.flags.DEFINE_integer('batch_size', 1024, "Batch size.")
+tf.app.flags.DEFINE_integer('embedding_size', 256, "Embedding dimensionality.")
 tf.app.flags.DEFINE_integer('hidden_size', 256, "Number of hidden units.")
 tf.app.flags.DEFINE_integer('rnn_layers', 2, "Number of RNN layers.")
 tf.app.flags.DEFINE_boolean('bidirectional_encoder', True, "Whether to use a"
@@ -30,7 +34,7 @@ tf.app.flags.DEFINE_string('attention', 'luong', "'bahdanau' or 'luong'"
                            " (default is 'luong').")
 tf.app.flags.DEFINE_float('dropout', .9, "Keep probability for dropout on the"
                           "RNNs' non-recurrent connections.")
-tf.app.flags.DEFINE_float('max_grad_norm', 10., "Clip gradients to this norm.")
+tf.app.flags.DEFINE_float('max_grad_norm', 11.5, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_integer('beam_size', 5, "Beam search size.")
 tf.app.flags.DEFINE_float('initial_p_sample', .35, "Initial decoder sampling"
                           " probability (0=ground truth, 1=use predictions).")
@@ -50,13 +54,13 @@ tf.app.flags.DEFINE_boolean('train_word_embeddings', False, "Backprop on/off.")
 
 
 # CONFIG
-tf.app.flags.DEFINE_integer('max_sentence_length', 400, "Max. word length of"
+tf.app.flags.DEFINE_integer('max_sentence_length', 150, "Max. word length of"
                             " training examples (both inputs and labels).")
 tf.app.flags.DEFINE_integer('num_steps_per_eval', 50, "Number of steps to wait"
                             " before running the graph with the dev set.")
-tf.app.flags.DEFINE_integer('max_epochs', 30, "Number of epochs to run"
+tf.app.flags.DEFINE_integer('max_epochs', 40, "Number of epochs to run"
                             " (0 = no limit).")
-tf.app.flags.DEFINE_string('extension', 'orig', "Data files' extension.")
+tf.app.flags.DEFINE_string('extension', 'arabizi', "Data files' extension.")
 tf.app.flags.DEFINE_string('decode', None, "Set to a path to run on a file.")
 tf.app.flags.DEFINE_string('output_path', os.path.join('output', 'result.txt'),
                            "Name of the output file with decoding results.")
@@ -78,16 +82,14 @@ if not FLAGS.word_embeddings:
 # Read the training and dev data files.
 print("Building dynamic character-level QALB data...", flush=True)
 DATASET = QALB(
-  'QALB', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+  file, parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
   shuffle=FLAGS.decode is None, max_input_length=FLAGS.max_sentence_length,
   max_label_length=FLAGS.max_sentence_length)
 
 
 # Get all unique word embeddings from the given FastText model.
-cat_files = ('ai/datasets/data/qalb/QALB.train.{0} '
-             'ai/datasets/data/qalb/QALB.dev.{0} '
-             'ai/datasets/data/qalb/QALB.test2014.{0} '
-             'ai/datasets/data/qalb/QALB.test2015.{0}'.format(FLAGS.extension))
+cat_files = ('ai/datasets/data/arabizi/ldc-ml-ready-train.{0} '
+             'ai/datasets/data/arabizi/ldc-ml-ready-dev.{0} '.format(FLAGS.extension))
 
 unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
              r"'!seen[$0]++' | ../fastText/fasttext print-word-vectors "
@@ -175,6 +177,9 @@ def train():
   
   with graph.as_default():
     
+    tf.set_random_seed(1)
+    random.seed(1)
+    np.random.seed(1)
     # During training we use beam width 1. There are lots of complications on
     # the implementation, e.g. only tiling during inference.
     m = CharSeq2Seq(
@@ -338,12 +343,17 @@ def decode():
   with open(FLAGS.decode) as test_file:
     lines = test_file.readlines()
     # Get the largest sentence length to set an upper bound to the decoder.
-    max_length = max([len(line) for line in lines])
+    max_length = FLAGS.max_sentence_length
+    # max_length = max([len(line) for line in lines])
   
   print("Building computational graph...", flush=True)
   graph = tf.Graph()
   with graph.as_default():
     
+    tf.set_random_seed(1)
+    random.seed(1)
+    np.random.seed(1)
+
     m = CharSeq2Seq(
       num_types=DATASET.num_types(),
       max_encoder_length=max_length, max_decoder_length=max_length,
@@ -379,8 +389,7 @@ def decode():
         # Sequences of text will only be repeated up to 5 times.
         top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
         output_file.write(top_line + '\n')
-        print("Output:")
-        print(top_line, flush=True, end='\n\n')
+        print("Output:", top_line, flush=True, end='\n\n')
 
 if FLAGS.decode:
   decode()

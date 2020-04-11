@@ -53,7 +53,7 @@ tf.app.flags.DEFINE_integer('max_sentence_length', 150, "Max. word length of"
                             " training examples (both inputs and labels).")
 tf.app.flags.DEFINE_integer('num_steps_per_eval', 50, "Number of steps to wait"
                             " before running the graph with the dev set.")
-tf.app.flags.DEFINE_integer('max_epochs', 30, "Number of epochs to run"
+tf.app.flags.DEFINE_integer('max_epochs', 40, "Number of epochs to run"
                             " (0 = no limit).")
 tf.app.flags.DEFINE_string('extension', 'arabizi', "Data files' extension.")
 tf.app.flags.DEFINE_string('decode', None, "Set to a path to run on a file.")
