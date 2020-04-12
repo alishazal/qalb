@@ -1,20 +1,29 @@
 """
-Usage: python tag.py [xyz.arabizi] [newXyz.arabizi] [context_number]
+Usage: python tag.py [xyz.arabizi] [xyz.gold] [newXyz.arabizi] [newXyz.gold] [xyz.lines] [context_number]
 """
 
 import sys
 
-arabiziFile = open(sys.argv[1], "r")
+arabizi = sys.argv[1]
+arabiziFile = open(arabizi, "r")
 afLines = arabiziFile.readlines()
 
-newArabiziFile = open(sys.argv[2], "w")
+gold = sys.argv[2]
+goldFile = open(gold, "r")
+gfLines = goldFile.readlines()
 
-context = int(sys.argv[3])
+newArabiziFile = open(sys.argv[3], "w")
+newGoldFile = open(sys.argv[4], "w")
+linesFile = open(sys.argv[5], "w")
+
+context = int(sys.argv[6])
 
 # Making tagged version of arabizi file
 for line in afLines:
     line = line.strip()
     line = line.split()
+
+    linesFile.write(str(len(line)) + "\n")
 
     wordCtr = 0
     for word in line:
@@ -36,11 +45,21 @@ for line in afLines:
                     newLine.append("<eos>")
 
         if context == 1:
-            strLine = ''.join(newLine) + " " + "\n"
+            strLine = ' '.join(newLine) + " " + "\n"
         else:
-            strLine = ''.join(newLine) + " " + "\n"
+            strLine = ' '.join(newLine) + " " + "\n"
         newArabiziFile.write(strLine)
         wordCtr += 1
 
+# Making single word per line version of gold file
+for line in gfLines:
+    line = line.strip()
+    line = line.split()
+    for word in line:
+        newGoldFile.write(word + "\n")
+
 arabiziFile.close()
+goldFile.close()
 newArabiziFile.close()
+newGoldFile.close()
+linesFile.close()

@@ -47,7 +47,7 @@ for line in afLines:
         if context == 1:
             strLine = ''.join(newLine) + " " + "\n"
         else:
-            strLine = ''.join(newLine) + "\n"
+            strLine = ''.join(newLine) + " " + "\n"
         newArabiziFile.write(strLine)
         wordCtr += 1
 
