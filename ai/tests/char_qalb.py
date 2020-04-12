@@ -127,7 +127,9 @@ def add_word_ids(batch):
   space_chid = DATASET.type_to_ix[(' ',)]
   space_like = [
     space_chid,
-    DATASET.type_to_ix['_PAD'], DATASET.type_to_ix['_EOS']]
+    DATASET.type_to_ix['_PAD'], DATASET.type_to_ix['_EOS'], DATASET.type_to_ix['<bos>'],
+    DATASET.type_to_ix['<eos>'], DATASET.type_to_ix['<bow>'], DATASET.type_to_ix['<eow>'],
+    DATASET.type_to_ix['[+]'], DATASET.type_to_ix['[-]']]
   new_batch = []
   for seq in batch:
     new_seq = []
