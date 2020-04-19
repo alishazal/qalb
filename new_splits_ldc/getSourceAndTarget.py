@@ -167,6 +167,7 @@ def removeSeparationTokens(line, file):
 
     line = line.replace("[+] ", "")
     line = line.replace("[-]", " ")
+    line = line.replace("[+]", "")
     return line
 
 dirs = os.listdir(sys.argv[1])
