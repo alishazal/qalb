@@ -1,41 +1,40 @@
-# Usage python accuracy.py [system-pred.out] [something.gold] [word/sentence]
+# Usage python accuracy.py [system-pred.out] [something.gold]
 
 import sys
 
-systemOutput = sys.argv[1]
-systemOutputfile = open(systemOutput, "r")
+systemOutputfile = open(sys.argv[1], "r")
 soLines = systemOutputfile.readlines()
 
-gold = sys.argv[2]
-goldFile = open(gold, "r")
+goldFile = open(sys.argv[2], "r")
 gfLines = goldFile.readlines()
 
 correct = 0
 total = 0
 
-correctDict = {}
-wrongDict = {}
 
 for i in range(len(soLines)):
-    if soLines[i] == gfLines[i]:
-        correct += 1
-        if len(soLines[i]) in correctDict:
-            correctDict[len(soLines[i])] += 1
-        else:
-            correctDict[len(soLines[i])] = 1
-    else:
-        if len(soLines[i]) in wrongDict:
-            wrongDict[len(soLines[i])] += 1
-        else:
-            wrongDict[len(soLines[i])] = 1
-    total += 1
+    currPredLine = soLines[i].split(" ")
+    currGoldLine = gfLines[i].split(" ")
 
-level = sys.argv[3]
-# if level == "word":
-#     print("Correct dictionary:", correctDict)
-#     print("Incorrect dictionary:", wrongDict)
-print("Correct lines are", correct)
-print("Total lines are", total)
+    if len(currPredLine) == len(currGoldLine):
+        for j in range(len(currPredLine)):
+            if currPredLine[j] == currGoldLine[j]:
+                correct += 1
+            total += 1
+    
+    elif len(currPredLine) > len(currGoldLine):
+        for j in range(len(currPredLine)):
+            if j < len(currGoldLine) and currPredLine[j] == currGoldLine[j]:
+                correct += 1
+            total += 1
+    else:
+        for j in range(len(currGoldLine)):
+            if j < len(currPredLine) and currPredLine[j] == currGoldLine[j]:
+                correct += 1
+            total += 1
+
+print("Correct words are", correct)
+print("Total words are", total)
 print("Accuracy is:", ((correct/total)*100))
 
 systemOutputfile.close()

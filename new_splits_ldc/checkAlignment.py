@@ -12,7 +12,7 @@ file2Lines = file2.readlines()
 
 misalignCount = 0
 for line in file1:
-    if len(line.split()) != len(file2Lines[lineCount].split()):
+    if len(line.strip().split()) != len(file2Lines[lineCount].strip().split()):
         print(line, "\n", file2Lines[lineCount])
         misalignCount += 1
     

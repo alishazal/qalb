@@ -1,23 +1,27 @@
 """Testing setup for QALB shared task."""
-
+c
 import io
 import os
+import sys
 import re
 import timeit
+import random
 
 import tensorflow as tf
 import editdistance
+import numpy as np
 from scipy import exp
 from scipy.special import lambertw
 
 from ai.datasets import QALB
 from ai.models import Seq2Seq
 
+file = sys.argv[1]
 
 # HYPERPARAMETERS
-tf.app.flags.DEFINE_float('lr', 5e-4, "Initial learning rate.")
-tf.app.flags.DEFINE_integer('batch_size', 128, "Batch size.")
-tf.app.flags.DEFINE_integer('embedding_size', 128, "Embedding dimensionality.")
+tf.app.flags.DEFINE_float('lr', 0.0001, "Initial learning rate.")
+tf.app.flags.DEFINE_integer('batch_size', 1024, "Batch size.")
+tf.app.flags.DEFINE_integer('embedding_size', 256, "Embedding dimensionality.")
 tf.app.flags.DEFINE_integer('hidden_size', 256, "Number of hidden units.")
 tf.app.flags.DEFINE_integer('rnn_layers', 2, "Number of RNN layers.")
 tf.app.flags.DEFINE_boolean('bidirectional_encoder', True, "Whether to use a"
@@ -27,9 +31,9 @@ tf.app.flags.DEFINE_string('bidirectional_mode', 'add', "Set to 'add',"
 tf.app.flags.DEFINE_boolean('use_lstm', False, "Set to False to use GRUs.")
 tf.app.flags.DEFINE_string('attention', 'luong', "'bahdanau' or 'luong'"
                            " (default is 'luong').")
-tf.app.flags.DEFINE_float('dropout', .6, "Keep probability for dropout on the"
+tf.app.flags.DEFINE_float('dropout', .9, "Keep probability for dropout on the"
                           "RNNs' non-recurrent connections.")
-tf.app.flags.DEFINE_float('max_grad_norm', 10., "Clip gradients to this norm.")
+tf.app.flags.DEFINE_float('max_grad_norm', 11.5, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_integer('beam_size', 5, "Beam search size.")
 tf.app.flags.DEFINE_float('initial_p_sample', .35, "Initial decoder sampling"
                           " probability (0=ground truth, 1=use predictions).")
@@ -45,13 +49,13 @@ tf.app.flags.DEFINE_float('beta1', .9, "First order moment decay.")
 tf.app.flags.DEFINE_float('beta2', .999, "Second order moment decay.")
 
 # CONFIG
-tf.app.flags.DEFINE_integer('max_sentence_length', 400, "Max. word length of"
+tf.app.flags.DEFINE_integer('max_sentence_length', 110, "Max. word length of"
                             " training examples (both inputs and labels).")
 tf.app.flags.DEFINE_integer('num_steps_per_eval', 50, "Number of steps to wait"
                             " before running the graph with the dev set.")
-tf.app.flags.DEFINE_integer('max_epochs', 30, "Number of epochs to run"
+tf.app.flags.DEFINE_integer('max_epochs', 40, "Number of epochs to run"
                             " (0 = no limit).")
-tf.app.flags.DEFINE_string('extension', 'mada.kmle', "Data files' extension.")
+tf.app.flags.DEFINE_string('extension', 'arabizi', "Data files' extension.")
 tf.app.flags.DEFINE_string('decode', None, "Set to a path to run on a file.")
 tf.app.flags.DEFINE_string('output_path', os.path.join('output', 'result.txt'),
                            "Name of the output file with decoding results.")
@@ -82,7 +86,7 @@ def train():
   """Run a loop that continuously trains the model."""
   print("Building dynamic character-level QALB data...", flush=True)
   dataset = QALB(
-    'ldc', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+    file, parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
     shuffle=True, max_input_length=FLAGS.max_sentence_length,
     max_label_length=FLAGS.max_sentence_length)
   
@@ -90,7 +94,11 @@ def train():
   graph = tf.Graph()
   
   with graph.as_default():
-    
+
+    tf.set_random_seed(1)
+    random.seed(1)
+    np.random.seed(1)
+
     # During training we use beam width 1. There are lots of complications on
     # the implementation, e.g. only tiling during inference.
     m = Seq2Seq(
@@ -240,17 +248,22 @@ def decode():
   with io.open(FLAGS.decode, encoding='utf-8') as test_file:
     lines = test_file.readlines()
     # Get the largest sentence length to set an upper bound to the decoder.
-    max_length = max([len(line) for line in lines])
+    max_length = FLAGS.max_sentence_length
+    # max_length = max([len(line) for line in lines])
     
   print("Building dynamic character-level QALB data...", flush=True)
   dataset = QALB(
-    'ldc', parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+    file, parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
     max_input_length=max_length, max_label_length=max_length)
   
   print("Building computational graph...", flush=True)
   graph = tf.Graph()
   with graph.as_default():
     
+    tf.set_random_seed(1)
+    random.seed(1)
+    np.random.seed(1)
+
     m = Seq2Seq(
       num_types=dataset.num_types(),
       max_encoder_length=max_length, max_decoder_length=max_length,
@@ -274,6 +287,8 @@ def decode():
       flush=True)
     with io.open(FLAGS.output_path, 'w', encoding='utf-8') as output_file:
       for line in lines:
+        if len(line) > max_length:
+          continue
         ids = dataset.tokenize(line)
         while len(ids) < max_length:
           ids.append(dataset.type_to_ix['_PAD'])
@@ -282,7 +297,8 @@ def decode():
         # Sequences of text will only be repeated up to 5 times.
         top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
         output_file.write(top_line + '\n')
-        print(top_line, flush=True)        
+        print("PREDICTION:", top_line, flush=True)
+        print()      
 
 
 def main(_):

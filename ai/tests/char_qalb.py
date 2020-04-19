@@ -54,7 +54,7 @@ tf.app.flags.DEFINE_boolean('train_word_embeddings', False, "Backprop on/off.")
 
 
 # CONFIG
-tf.app.flags.DEFINE_integer('max_sentence_length', 150, "Max. word length of"
+tf.app.flags.DEFINE_integer('max_sentence_length', 110, "Max. word length of"
                             " training examples (both inputs and labels).")
 tf.app.flags.DEFINE_integer('num_steps_per_eval', 50, "Number of steps to wait"
                             " before running the graph with the dev set.")
@@ -88,8 +88,8 @@ DATASET = QALB(
 
 
 # Get all unique word embeddings from the given FastText model.
-cat_files = ('ai/datasets/data/arabizi/ldc-ml-ready-train.{0} '
-             'ai/datasets/data/arabizi/ldc-ml-ready-dev.{0} '.format(FLAGS.extension))
+cat_files = ('ai/datasets/data/arabizi/{0}-train.{1} '
+             'ai/datasets/data/arabizi/{0}-dev.{1} '.format(file , FLAGS.extension))
 
 unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
              r"'!seen[$0]++' | ../../fastText/fasttext print-word-vectors "
