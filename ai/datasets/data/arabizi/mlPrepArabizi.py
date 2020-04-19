@@ -8,22 +8,27 @@ Function -> MLprepArabizi(source):
     > non-ascii characters => # (this converts arabic, graphic emojis and other foreign language chars to #)
     > text emoji /e.g. :) :P :-)/ => #
     > punctuations => #
-    > Emojis attached to a word are kept as they are
+    > Emojis and punctuations attached to a word are kept as they are
 """
 
 import sys
 import unicodedata as ud
 import re
 
+def allNonAscii(word):
+    for char in word:
+        if ord(char) < 128:
+            return False
+    
+    return True
+
 def changeNonAsciiToHash(line):
 
     words = line.split()
     
     for i in range(len(words)):
-        for char in words[i]:
-            if ord(char) > 127:
-                words[i] = "#"
-                break
+        if allNonAscii(words[i]):
+            words[i] = "#"
 
     return " ".join(words)
 
