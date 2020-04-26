@@ -95,9 +95,9 @@ def compress(line, limit):
 def mlPrep(line):
 
     line = line.strip()
+    line = compress(line, 2)
     line = line.lower()
     line = removeAccents(line)
-    line = compress(line, 2)
     line = changeNonAsciiToHash(line)
     line = changeTextEmojiAndPuncToHash(line)
     return line

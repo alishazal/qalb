@@ -22,7 +22,7 @@ for line in afLines:
 
         for i in list(range(-context, context+1)):
             if wordCtr + i >= 0 and wordCtr + i < len(line):
-                if wordCtr + i  == 0:
+                if wordCtr + i  == 0 and wordCtr == 0:
                     newLine.append("<bos>")
             
                 if i == 0:
@@ -32,13 +32,10 @@ for line in afLines:
                 else:
                     newLine.append(line[wordCtr + i])
 
-                if wordCtr + i == len(line) - 1:
+                if wordCtr + i == len(line) - 1 and wordCtr == len(line) - 1:
                     newLine.append("<eos>")
 
-        if context == 1:
-            strLine = " ".join(newLine) + "\n"
-        else:
-            strLine = " ".join(newLine) + "\n"
+        strLine = " ".join(newLine) + "\n"
         newArabiziFile.write(strLine)
         wordCtr += 1
 
