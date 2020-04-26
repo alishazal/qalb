@@ -1,5 +1,4 @@
 """Testing setup for QALB shared task."""
-c
 import io
 import os
 import sys
