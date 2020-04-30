@@ -6,6 +6,54 @@ Usage: python3 generate-report.py [source] [initial-output.out] [initial-output.
 import sys
 import math
 
+def calcIncorrectPlusToken(system, gold):
+    if "[+]" in system:
+        count = 0
+        system = system.strip().split(" ")
+        gold = gold.strip().split(" ")
+        for i in range(len(system)):
+            if "[+]" in system[i] and "[+]" not in gold[i]:
+                count += 1
+        return count
+    else:
+        return 0
+
+def calcMissingPlusToken(system, gold):
+    if "[+]" in gold:
+        count = 0
+        system = system.strip().split(" ")
+        gold = gold.strip().split(" ")
+        for i in range(len(system)):
+            if "[+]" in gold[i] and "[+]" not in system[i]:
+                count += 1
+        return count
+    else:
+        return 0
+
+def calcIncorrectMinusToken(system, gold):
+    if "[-]" in system:
+        count = 0
+        system = system.strip().split(" ")
+        gold = gold.strip().split(" ")
+        for i in range(len(system)):
+            if "[-]" in system[i] and "[-]" not in gold[i]:
+                count += 1
+        return count
+    else:
+        return 0
+
+def calcMissingMinusToken(system, gold):
+    if "[-]" in gold:
+        count = 0
+        system = system.strip().split(" ")
+        gold = gold.strip().split(" ")
+        for i in range(len(system)):
+            if "[-]" in gold[i] and "[-]" not in system[i]:
+                count += 1
+        return count
+    else:
+        return 0
+
 def countAlignedLines(system, gold):
     count = 0
     for i in range(len(system)):
@@ -153,24 +201,23 @@ def prettyBins(dict):
         print(("|" + str(dict[acc]) + "|" + "\t").expandtabs(10), end = "")
     print()
 
-def lineBreakdown(ia, ig, inta, intg, fa, fg, groupsOf):
+def lineBreakdown(ia, ig, inta, intg, groupsOf):
     totalLines = len(ia)
     numberOfGroupsOfThousands = totalLines // groupsOf
 
     count = 0
     for i in range(numberOfGroupsOfThousands):
-        print("Accuracy of {}-{} lines: Initial {}, Intermediate {}, Final {}"
+        print("Accuracy of {}-{} lines: Initial {}, Source Aligned {}"
         .format(count, count + groupsOf, overallAccuracy(ia[count:count+groupsOf+1], ig[count:count+groupsOf+1]),
-        overallAccuracy(inta[count:count+groupsOf+1], intg[count:count+groupsOf+1]), 
-        overallAccuracy(fa[count:count+groupsOf+1], fg[count:count+groupsOf+1])))
+        overallAccuracy(inta[count:count+groupsOf+1], intg[count:count+groupsOf+1])))
 
         count += groupsOf
 
-    print("Accuracy of {}-{} lines: Initial {}, Intermediate {}, Final {}"
+    # Checking any lines that are left
+    print("Accuracy of {}-{} lines: Initial {}, Source Aligned {}"
         .format(count, totalLines, overallAccuracy(ia[count:totalLines], ig[count:totalLines]),
-        overallAccuracy(inta[count:totalLines], intg[count:totalLines]), 
-        overallAccuracy(fa[count:totalLines], fg[count:totalLines])))
-    # Dont forget to check the last 504 lines
+        overallAccuracy(inta[count:totalLines], intg[count:totalLines])))
+    
 
 source = open(sys.argv[1], "r").readlines()
 initialArabizi = open(sys.argv[2], "r").readlines()
@@ -181,25 +228,32 @@ finalArabizi = open(sys.argv[6], "r").readlines()
 finalGold = open(sys.argv[7], "r").readlines()
 
 report = open(sys.argv[8], "w")
+
 incorrectHashtag = 0
 hashtagFailure = 0
+
 incorrectInitialAlignment = 0
 incorrectIntermediateAlignment = 0
 incorrectFinalAlignment = 0
+
+incorrectPlusToken = 0
+missingPlusToken = 0
+incorrectMinusToken = 0
+missingMinusToken = 0
+
 initialAccuracyBin = {}
 intermediateAccuracyBin = {}
-finalAccuracyBin = {}
 
 for i in range(len(source)):
-    report.write(("Source: \t" + source[i]).expandtabs(20))
-    report.write(("InitialOut: \t" + initialArabizi[i]).expandtabs(20))
-    report.write(("InitialGold: \t" + initialGold[i]).expandtabs(20))
+    report.write(("Source: \t" + source[i]).expandtabs(30))
+    report.write(("InitialOut: \t" + initialArabizi[i]).expandtabs(30))
+    report.write(("InitialGold: \t" + initialGold[i]).expandtabs(30))
     
-    report.write(("IntermediateOut: \t" + intermediateArabizi[i]).expandtabs(20))
-    report.write(("IntermediateGold: \t" + intermediateGold[i]).expandtabs(20))
+    report.write(("AlignedFinalOut: \t" + intermediateArabizi[i]).expandtabs(30))
+    report.write(("AlignedFinalGold: \t" + intermediateGold[i]).expandtabs(30))
     
-    report.write(("FinalOut: \t" + finalArabizi[i]).expandtabs(20))
-    report.write(("FinalGold: \t" + finalGold[i]).expandtabs(20))
+    report.write(("UnalignedFinalOut: \t" + finalArabizi[i]).expandtabs(30))
+    report.write(("UnalignedFinalGold: \t" + finalGold[i]).expandtabs(30))
 
     if "#" in initialArabizi[i]:
         hashtagMisalignmentCount = checkHashtagAlignmentFromSystem(initialArabizi[i], initialGold[i])
@@ -238,20 +292,16 @@ for i in range(len(source)):
             intermediateAccuracyBin[intIntermediateAccuracy] += 1
         else:
             intermediateAccuracyBin[intIntermediateAccuracy] = 1
-        report.write("Intermediate accuracy: " + intermediateAccuracy + "\n")
+        report.write("Source aligned final accuracy: " + intermediateAccuracy + "\n")
+
+        incorrectPlusToken += calcIncorrectPlusToken(intermediateArabizi[i], intermediateGold[i])
+        missingPlusToken += calcMissingPlusToken(intermediateArabizi[i], intermediateGold[i])
+        incorrectMinusToken += calcIncorrectMinusToken(intermediateArabizi[i], intermediateGold[i])
+        missingMinusToken += calcMissingMinusToken(intermediateArabizi[i], intermediateGold[i])
 
     if len(finalArabizi[i].split(" ")) != len(finalGold[i].split(" ")):
         incorrectFinalAlignment += 1
         report.write("ERROR: Incorrect alignment in final output\n")
-    else:
-        finalAccuracy = accuracy(finalArabizi[i], finalGold[i])
-        intFinalAccuracy = round(int(float(finalAccuracy)), -1)
-        if intFinalAccuracy in finalAccuracyBin:
-            finalAccuracyBin[intFinalAccuracy] += 1
-        else:
-            finalAccuracyBin[intFinalAccuracy] = 1
-
-        report.write("Final accuracy: " + finalAccuracy + "\n")
 
     report.write("\n")
 
@@ -260,23 +310,21 @@ report.close()
 
 print("\tInitial Accuracy Bins".expandtabs(35))
 prettyBins(initialAccuracyBin)
-print("\tIntermediate Accuracy Bins".expandtabs(35))
+print("\tSource Aligned Final Accuracy Bins".expandtabs(35))
 prettyBins(initialAccuracyBin)
-print("\tFinal Accuracy Bins".expandtabs(35))
-prettyBins(finalAccuracyBin)
 print()
-lineBreakdown(initialArabizi, initialGold, intermediateArabizi, intermediateGold, finalArabizi, finalGold, 1000)
-print()
-print("Accuracy of {} aligned lines: {}".format(countAlignedLines(finalArabizi, finalGold), overallAccuracyOfAlignedLines(finalArabizi, finalGold)))
-print("Accuracy of {} unaligned lines: {}".format(countUnalignedLines(finalArabizi, finalGold), overallAccuracyOfUnalignedLines(finalArabizi, finalGold)))
+lineBreakdown(initialArabizi, initialGold, intermediateArabizi, intermediateGold, 1000)
 print()
 print("Overall Initial Accuracy: " + overallAccuracy(initialArabizi, initialGold))
-print("Overall Intermediate Accuracy: " + overallAccuracy(intermediateArabizi, intermediateGold))
-print("Overall Final Accuracy: " + overallAccuracy(finalArabizi, finalGold))
-print("Overall Hashtag Accuracy: " + str(round((globalHashtagCorrect/globalHashtagTotal)*100, 1)))
+print("Overall Source Aligned Final Accuracy: " + overallAccuracy(intermediateArabizi, intermediateGold))
 print()
 print("Total incorrect hashtag errors: " + str(incorrectHashtag))
 print("Total missing hashtags: " + str(hashtagFailure))
+print("Overall Hashtag Accuracy: " + str(round((globalHashtagCorrect/globalHashtagTotal)*100, 1)))
+print()
+print("Incorrect [+] tokens: {}; Incorrect [-] tokens: {}; Total: {}".format(str(incorrectPlusToken), str(incorrectMinusToken), str(incorrectPlusToken + incorrectMinusToken)))
+print("Missing [+] tokens: {}; Missing [-] tokens: {}; Total: {}".format(str(missingPlusToken), str(missingMinusToken), str(missingPlusToken + missingMinusToken)))
+print()
 print("Total incorrect initial alignment errors: " + str(incorrectInitialAlignment))
 print("Total incorrect intermediate alignment errors: " + str(incorrectIntermediateAlignment))
 print("Total incorrect final alignment errors: " + str(incorrectFinalAlignment))
