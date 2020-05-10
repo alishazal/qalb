@@ -386,51 +386,47 @@ def decode():
         number_of_chars = len(line)
         completely_divisble = number_of_chars % FLAGS.max_sentence_length == 0
 
-      if number_of_chars < FLAGS.max_sentence_length:
-        parts = [line]
-      else:
-        parts = []
-        count = 0
-        last_word_end_index = 0
+        if number_of_chars < FLAGS.max_sentence_length:
+          parts = [line]
+        else:
+          parts = []
+          count = 0
+          last_word_end_index = 0
 
-        line_copy = line
-        while len(line_copy) != 0 and count < len(line_copy):
-          if count == FLAGS.max_sentence_length:
-            if last_word_end_index == 0:
-              parts.append(line_copy[: count])
-              line_copy = line_copy[count:]
-            else:
-              parts.append(line_copy[: last_word_end_index])
-              line_copy = line_copy[last_word_end_index:]
-                
-              last_word_end_index = 0
-              count = 0
+          line_copy = line
+          while len(line_copy) != 0 and count < len(line_copy):
+            if count == FLAGS.max_sentence_length:
+              if last_word_end_index == 0:
+                parts.append(line_copy[: count])
+                line_copy = line_copy[count:]
+              else:
+                parts.append(line_copy[: last_word_end_index])
+                line_copy = line_copy[last_word_end_index:]
+                  
+                last_word_end_index = 0
+                count = 0
 
-          if line_copy[count] == " ":
-            last_word_end_index = count
+            if line_copy[count] == " ":
+              last_word_end_index = count
 
-          count += 1
+            count += 1
 
-        if not completely_divisble:
-          parts.append(line_copy)
-      
-      print("HERE1")
-      result = ""
-      for part in parts:
-        ids = DATASET.tokenize(part)
-        while len(ids) < max_length:
-          ids.append(DATASET.type_to_ix['_PAD'])
-        ids = add_word_ids([ids])
-        outputs = sess.run(m.generative_output, feed_dict={m.inputs: ids})
-        top_line = untokenize_batch(outputs)[0]
-        # Sequences of text will only be repeated up to 5 times.
-        top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
-        result += top_line
-        print("HERE2")
-      
-      print("HERE3")
-      output_file.write(result + '\n')
-      print("Output:", result, flush=True, end='\n\n')
+          if not completely_divisble:
+            parts.append(line_copy)
+        
+        result = ""
+        for part in parts:
+          ids = DATASET.tokenize(part)
+          while len(ids) < max_length:
+            ids.append(DATASET.type_to_ix['_PAD'])
+          ids = add_word_ids([ids])
+          outputs = sess.run(m.generative_output, feed_dict={m.inputs: ids})
+          top_line = untokenize_batch(outputs)[0]
+          # Sequences of text will only be repeated up to 5 times.
+          top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
+          result += top_line
+        output_file.write(result + '\n')
+        print("Output:", result, flush=True, end='\n\n')
 
 if FLAGS.decode:
   decode()
