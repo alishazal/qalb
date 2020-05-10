@@ -413,7 +413,8 @@ def decode():
 
         if not completely_divisble:
           parts.append(line_copy)
-          
+      
+      print("HERE1")
       result = ""
       for part in parts:
         ids = DATASET.tokenize(part)
@@ -425,7 +426,9 @@ def decode():
         # Sequences of text will only be repeated up to 5 times.
         top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
         result += top_line
+        print("HERE2")
       
+      print("HERE3")
       output_file.write(result + '\n')
       print("Output:", result, flush=True, end='\n\n')
 
