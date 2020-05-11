@@ -286,16 +286,50 @@ def decode():
       flush=True)
     with io.open(FLAGS.output_path, 'w', encoding='utf-8') as output_file:
       for line in lines:
-        if len(line) > max_length:
-          continue
-        ids = dataset.tokenize(line)
-        while len(ids) < max_length:
-          ids.append(dataset.type_to_ix['_PAD'])
-        outputs = sess.run(m.generative_output, feed_dict={m.inputs: [ids]})
-        top_line = untokenize_batch(dataset, outputs)[0]
-        # Sequences of text will only be repeated up to 5 times.
-        top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
-        output_file.write(top_line + '\n')
+        # if len(line) > max_length:
+        #   continue
+        number_of_chars = len(line)
+        completely_divisble = number_of_chars % FLAGS.max_sentence_length == 0
+
+        if number_of_chars < FLAGS.max_sentence_length:
+          parts = [line]
+        else:
+          parts = []
+          count = 0
+          last_word_end_index = 0
+
+          line_copy = line
+          while len(line_copy) != 0 and count < len(line_copy):
+            if count == FLAGS.max_sentence_length:
+              if last_word_end_index == 0:
+                parts.append(line_copy[: count])
+                line_copy = line_copy[count:]
+              else:
+                parts.append(line_copy[: last_word_end_index])
+                line_copy = line_copy[last_word_end_index:]
+                  
+                last_word_end_index = 0
+                count = 0
+
+            if line_copy[count] == " ":
+              last_word_end_index = count
+
+            count += 1
+
+          if not completely_divisble:
+            parts.append(line_copy)
+        
+        result = ""
+        for part in parts:
+          ids = dataset.tokenize(part)
+          while len(ids) < max_length:
+            ids.append(dataset.type_to_ix['_PAD'])
+          outputs = sess.run(m.generative_output, feed_dict={m.inputs: [ids]})
+          top_line = untokenize_batch(dataset, outputs)[0]
+          # Sequences of text will only be repeated up to 5 times.
+          top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
+          result += top_line
+        output_file.write(result + '\n')
         print("PREDICTION:", top_line, flush=True)
         print()      
 
