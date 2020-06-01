@@ -44,14 +44,19 @@ class BaseDataset(object):
     ['<bos>', '<bow>', 'm', 'n', 'f', 'u', 'k', 'h', 'a', '<eow>', 's', 'h', 'w', 'a', 'y', 'a', 
     '<spa>', 'w', 'a', 'l', 'a', 'h', 'y', '<eos>']
     """
-    tags = ['<bos>', '<eos>', '<bow>', '<eow>', '<spa>']
+    tags = ['<bos>', '<eos>', '<bow>', '<eow>', '<wb>']
     line = []
-    
+
     i = 0
     while i < len(input_list):
         if input_list[i] == "<" and input_list[i:i+5] in tags:
             line.append(input_list[i:i+5])
             i += 5
+
+        elif input_list[i] == "<" and input_list[i:i+4] in tags:
+            line.append(input_list[i:i+4])
+            i += 4
+            
         else:
             line.append(input_list[i])
             i += 1

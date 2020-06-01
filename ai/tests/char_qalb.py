@@ -89,8 +89,7 @@ DATASET = QALB(
 
 # Get all unique word embeddings from the given FastText model.
 cat_files = ('ai/datasets/data/arabizi/{0}-train.{1} '
-             'ai/datasets/data/arabizi/{0}-dev.{1} '
-             'ai/datasets/data/arabizi/{0}-test.{1} '.format(file , FLAGS.extension))
+             'ai/datasets/data/arabizi/{0}-dev.{1} '.format(file , FLAGS.extension))
 
 unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
              r"'!seen[$0]++' | ../../fastText/fasttext print-word-vectors "
