@@ -15,7 +15,6 @@ def zeroContext(afLines, newArabiziFile, linesFile):
             newArabiziFile.write("<bow> " + word + " <eow>" + "\n")
 
 def nonZeroContext(afLines, newArabiziFile, linesFile, context):
-    
     # Making tagged version of arabizi file
     for line in afLines:
         line = line.strip()
@@ -23,29 +22,11 @@ def nonZeroContext(afLines, newArabiziFile, linesFile, context):
 
         linesFile.write(str(len(line)) + "\n")
 
-        wordCtr = 0
-        for word in line:
-            newLine = []
-
-            for i in list(range(-context, context+1)):
-                if wordCtr + i >= 0 and wordCtr + i < len(line):
-                    if wordCtr + i  == 0 and wordCtr == 0:
-                        newLine.append("<bos>")
-                
-                    if i == 0:
-                        newLine.extend(["<bow>", word, "<eow>"])
-                    elif len(newLine) != 0 and newLine[-1] not in ["<bow>", "<eow>", "<bos>", "<eos>"]:
-                        newLine.extend([" ", line[wordCtr + i]])
-                    else:
-                        newLine.append(line[wordCtr + i])
-
-                    if wordCtr + i == len(line) - 1 and wordCtr == len(line) - 1:
-                        newLine.append("<eos>")
-
+        line = (["<bos>"] * context) + line  + (["<eos>"] * context)
+        for word in range(context, len(line) - context):
+            newLine = line[word - context: word] + ["<bow>", line[word], "<eow>"] + line[word + 1: word + context + 1]
             strLine = " ".join(newLine) + "\n"
             newArabiziFile.write(strLine)
-            wordCtr += 1
-    
 
 afLines = open(sys.argv[1], "r").readlines()
 gfLines = open(sys.argv[2], "r").readlines()
