@@ -155,7 +155,7 @@ def lineBreakdown(ia, ig, inta, intg, groupsOf):
     numberOfGroupsOfThousands = totalLines // groupsOf
 
     count = 0
-    for i in range(numberOfGroupsOfThousands):
+    for _ in range(numberOfGroupsOfThousands):
         print("Accuracy of {}-{} lines: Initial {}, Source Aligned {}"
         .format(count, count + groupsOf, overallAccuracy(ia[count:count+groupsOf+1], ig[count:count+groupsOf+1]),
         overallAccuracy(inta[count:count+groupsOf+1], intg[count:count+groupsOf+1])))
