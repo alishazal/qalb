@@ -1,5 +1,5 @@
 """
-Usage: python ay-normalize.py [file] [normalized-file]
+Usage: python ay-normalize.py [original-file] [normalized-file]
 """
 
 import sys

@@ -54,57 +54,6 @@ def calcMissingMinusToken(system, gold):
     else:
         return 0
 
-def countAlignedLines(system, gold):
-    count = 0
-    for i in range(len(system)):
-        if len(system[i].split()) == len(gold[i].split()):
-            count += 1
-    return count
-
-def countUnalignedLines(system, gold):
-    count = 0
-    for i in range(len(system)):
-        if len(system[i].split()) != len(gold[i].split()):
-            count += 1
-    return count
-
-def overallAccuracyOfUnalignedLines(system, gold):
-    correct = 0
-    total = 0
-
-    for i in range(len(system)):
-        currPredLine = system[i].split(" ")
-        currGoldLine = gold[i].split(" ")
-        
-        if len(currPredLine) > len(currGoldLine):
-            for j in range(len(currPredLine)):
-                if j < len(currGoldLine) and currPredLine[j] == currGoldLine[j]:
-                    correct += 1
-                total += 1
-        elif len(currPredLine) < len(currGoldLine):
-            for j in range(len(currGoldLine)):
-                if j < len(currPredLine) and currPredLine[j] == currGoldLine[j]:
-                    correct += 1
-                total += 1
-
-    return str(round((correct/total) * 100, 1))
-
-def overallAccuracyOfAlignedLines(system, gold):
-    correct = 0
-    total = 0
-
-    for i in range(len(system)):
-        currPredLine = system[i].split(" ")
-        currGoldLine = gold[i].split(" ")
-
-        if len(currPredLine) == len(currGoldLine):
-            for j in range(len(currPredLine)):
-                if currPredLine[j] == currGoldLine[j]:
-                    correct += 1
-                total += 1
-
-    return str(round((correct/total) * 100, 1))
-
 def overallAccuracy(system, gold):
     correct = 0
     total = 0
@@ -172,8 +121,8 @@ def checkHashtagAlignmentFromSystem(system, gold):
     gold = gold.strip().split(" ")
 
     count = 0
-    for i in range(len(system)):
-        if system[i] == "#" and gold[i] != "#":
+    for i in range(len(gold)):
+        if i < len(system) and system[i] == "#" and gold[i] != "#":
             count += 1
     
     return str(count)
@@ -183,8 +132,8 @@ def checkHashtagGenerationFailure(system, gold):
     gold = gold.strip().split(" ")
 
     count = 0
-    for i in range(len(system)):
-        if gold[i] == "#" and system[i] != "#":
+    for i in range(len(gold)):
+        if i < len(system) and gold[i] == "#" and system[i] != "#":
             count += 1
 
     return str(count)
