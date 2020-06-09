@@ -21,7 +21,7 @@ file = sys.argv[1]
 
 # HYPERPARAMETERS
 tf.app.flags.DEFINE_float('lr', 0.0001, "Initial learning rate.")
-tf.app.flags.DEFINE_integer('batch_size', 1024, "Batch size.")
+tf.app.flags.DEFINE_integer('batch_size', 2048, "Batch size.")
 tf.app.flags.DEFINE_integer('embedding_size', 256, "Embedding dimensionality.")
 tf.app.flags.DEFINE_integer('hidden_size', 256, "Number of hidden units.")
 tf.app.flags.DEFINE_integer('rnn_layers', 2, "Number of RNN layers.")
