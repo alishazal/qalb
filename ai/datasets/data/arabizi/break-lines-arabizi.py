@@ -11,18 +11,27 @@ length = int(sys.argv[4])
 
 for line in orig:
     line = line.strip().split()
+    currLineNoOfWords = len(line)
 
-    if len(line) <= length:
+    if currLineNoOfWords <= length:
         new.write(" ".join(line) + "\n")
-        linesFile.write("1\n")
+        linesFile.write(str(currLineNoOfWords) + " no " + "\n")
     
     else:
         count = 0
-        for i in range(0, len(line), length):
-            new.write(" ".join(line[i:i+length]) + "\n")
+        for i in range(0, currLineNoOfWords, length):
+            if currLineNoOfWords - i >= length:
+                new.write(" ".join(line[i:i+length]) + "\n")
+                if i+length >= currLineNoOfWords:
+                    linesFile.write(str(length) + " no " + "\n")
+                else:
+                    linesFile.write(str(length) + " yes " + "\n")
+            else:
+                remainder = currLineNoOfWords % length
+                new.write(" ".join(line[i-(length-remainder):i+remainder]) + "\n")
+                linesFile.write(str(remainder) + " no " + "\n")
+            
             count += 1
-        
-        linesFile.write(str(count) + "\n")
 
 orig.close()
 new.close()

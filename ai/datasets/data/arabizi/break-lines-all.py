@@ -15,19 +15,30 @@ for line in range(len(origArabizi)):
     currArabiziLine = origArabizi[line].strip().split()
     currGoldLine = origGold[line].strip().split()
 
-    if len(currArabiziLine) <= length:
+    currLineNoOfWords = len(currArabiziLine)
+
+    if currLineNoOfWords <= length:
         newArabizi.write(" ".join(currArabiziLine) + "\n")
         newGold.write(" ".join(currGoldLine) + "\n")
-        linesFile.write("1\n")
+        linesFile.write(str(currLineNoOfWords) + " no " + "\n")
     
     else:
         count = 0
-        for i in range(0, len(currArabiziLine), length):
-            newArabizi.write(" ".join(currArabiziLine[i:i+length]) + "\n")
-            newGold.write(" ".join(currGoldLine[i:i+length]) + "\n")
+        for i in range(0, currLineNoOfWords, length):
+            if currLineNoOfWords - i >= length:
+                newArabizi.write(" ".join(currArabiziLine[i:i+length]) + "\n")
+                newGold.write(" ".join(currGoldLine[i:i+length]) + "\n")
+                if i+length >= currLineNoOfWords:
+                    linesFile.write(str(length) + " no " + "\n")
+                else:
+                    linesFile.write(str(length) + " yes " + "\n")
+            else:
+                remainder = currLineNoOfWords % length
+                newArabizi.write(" ".join(currArabiziLine[i-(length-remainder):i+remainder]) + "\n")
+                newGold.write(" ".join(currGoldLine[i-(length-remainder):i+remainder]) + "\n")
+                linesFile.write(str(remainder) + " no " + "\n")
+
             count += 1
-        
-        linesFile.write(str(count) + "\n")
 
 newArabizi.close()
 newGold.close()
