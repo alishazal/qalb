@@ -1,5 +1,5 @@
 """
-Usage: python join-broken-lines.py [broken.arabizi] [xyz.lines] [final.out]
+Usage: python join-broken-lines-version-2-beginning-chunk.py [broken.arabizi] [xyz.lines] [final.out]
 """
 
 import sys
@@ -13,10 +13,8 @@ for l in range(len(broken)):
     currBrokenLine = broken[l].strip().split()
     currLinesLine = lines[l].strip().split()
     
-    if currLinesLine[1] == "yes":
-        newCompleteLine.extend(currBrokenLine)
-    else:
-        newCompleteLine.extend(currBrokenLine[-int(currLinesLine[0]):])
+    newCompleteLine.extend(currBrokenLine[:int(currLinesLine[0])])
+    if currLinesLine[1] == "no":
         final.write(" ".join(newCompleteLine) + "\n")
         newCompleteLine = []
 

@@ -1,8 +1,9 @@
 """
-UsageL python3 break-lines-all.py [original.arabizi] [original.gold] [newArabizi.arabizi] [new.gold] [new.lines] [chunk-length]
+Usage: python3 break-lines-all-version-2-beginning-chunk.py [original.arabizi] [original.gold] [newArabizi.arabizi] [new.gold] [new.lines] [chunk-length]
 """
 
 import sys
+import math
 
 origArabizi = open(sys.argv[1], "r").readlines()
 origGold = open(sys.argv[2], "r").readlines()
@@ -23,6 +24,8 @@ for line in range(len(origArabizi)):
         linesFile.write(str(currLineNoOfWords) + " no " + "\n")
     
     else:
+        remainder = currLineNoOfWords % length
+        totalIterations = math.ceil(currLineNoOfWords / length)
         count = 0
         for i in range(0, currLineNoOfWords, length):
             if currLineNoOfWords - i >= length:
@@ -31,12 +34,14 @@ for line in range(len(origArabizi)):
                 if i+length >= currLineNoOfWords:
                     linesFile.write(str(length) + " no " + "\n")
                 else:
-                    linesFile.write(str(length) + " yes " + "\n")
+                    if count == totalIterations - 2 and remainder != 0:
+                        linesFile.write(str(remainder) + " yes " + "\n")
+                    else:
+                        linesFile.write(str(length) + " yes " + "\n")
             else:
-                remainder = currLineNoOfWords % length
                 newArabizi.write(" ".join(currArabiziLine[i-(length-remainder):i+remainder]) + "\n")
                 newGold.write(" ".join(currGoldLine[i-(length-remainder):i+remainder]) + "\n")
-                linesFile.write(str(remainder) + " no " + "\n")
+                linesFile.write(str(length) + " no " + "\n")
 
             count += 1
 
