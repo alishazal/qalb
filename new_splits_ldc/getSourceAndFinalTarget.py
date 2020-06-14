@@ -213,7 +213,7 @@ for i in dirs:
                 currGoldLine[wordsOfThisLineCounter] = currGoldLine[wordsOfThisLineCounter][:-3]
 
             if ("tag" in allWords[j].attrib and allWords[j].attrib["tag"] in ["punctuation", "foreign"]) or isWholeWordForeign(allWords[j].text):
-                currGoldLine[wordsOfThisLineCounter] = currLineSourceWords[wordsOfThisLineCounter].text
+                currGoldLine[wordsOfThisLineCounter] = currLineSourceWords[wordsOfThisLineCounter]
 
             if "#" in currGoldLine[wordsOfThisLineCounter]:
                 currGoldLine[wordsOfThisLineCounter] = fixHash(currGoldLine[wordsOfThisLineCounter], allWords[j].text)
