@@ -1,5 +1,5 @@
 """
-Usage: python3 break-lines-all-version-2-beginning-chunk.py [original.arabizi] [original.gold] [newArabizi.arabizi] [new.gold] [new.lines] [chunk-length]
+Usage: python3 break-lines-all.py [original.arabizi] [original.gold] [newArabizi.arabizi] [new.gold] [new.lines] [chunk-length]
 """
 
 import sys

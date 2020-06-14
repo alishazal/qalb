@@ -1,5 +1,5 @@
 """
-Usage: python join-broken-lines-version-2-beginning-chunk.py [broken.arabizi] [xyz.lines] [final.out]
+Usage: python join-broken-lines.py [broken.arabizi] [xyz.lines] [final.out]
 """
 
 import sys

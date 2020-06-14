@@ -1,18 +1,17 @@
 """
-Usage: python3 mle.py [train.arabizi] [train.gold] [dev.arabizi] [dev-source.arabizi] [pred.out] [unknown.out] [in-vocab-number]
+Usage: python3 mle.py [train.arabizi] [train.gold] [dev.arabizi] [pred.out] [unknown.out] [in-vocab-number]
 """
 import sys
 
 trainA = open(sys.argv[1], "r").readlines()
 trainG = open(sys.argv[2], "r").readlines()
 devA = open(sys.argv[3], "r").readlines()
-devS = open(sys.argv[4], "r").readlines()
-pred = open(sys.argv[5], "w")
+pred = open(sys.argv[4], "w")
 
 # Unknown words file is created to help in combining seq2seq with mle
-unknown = open(sys.argv[6], "w")
+unknown = open(sys.argv[5], "w")
 
-inVocabNum = int(sys.argv[7])
+inVocabNum = int(sys.argv[6])
 
 def postprocess(line):
     for word in range(1, len(line)):
@@ -69,19 +68,17 @@ unknownWordCounter = 0
 totalWords = 0
 for line in range(len(devA)):
     currArabiziLine = devA[line].strip().split()
-    currArabiziSourceLine = devS[line].strip().split()
     ans = []
     unk = []
 
     for word in range(len(currArabiziLine)):
         currWord = currArabiziLine[word]
-        currSourceWord = currArabiziSourceLine[word]
         if currWord in mle and inVocabulary[currWord] >= inVocabNum:
             ans.append(mle[currWord])
             unk.append("0")
         else:
             unknownWordCounter += 1
-            ans.append(currSourceWord)
+            ans.append("#")
             unk.append("1")
         
         totalWords += 1
