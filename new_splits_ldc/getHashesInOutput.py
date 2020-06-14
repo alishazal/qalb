@@ -1,5 +1,5 @@
 """
-Usage: python3 getSourceAndTarget.py [folder] [folder/ml-target.gold]
+Usage: python3 getHashesInOutput.py [folder] [folder/ml-target.gold]
 """
 
 import xml.etree.ElementTree as ET

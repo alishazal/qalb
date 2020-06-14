@@ -195,6 +195,7 @@ for i in dirs:
         if source.text == None:
             continue
 
+        currLineSourceWords = source.text.strip().split()
         arabiziOutput.write(source.text.strip() + "\n")
 
         currGoldLine = ar2bw(allRawGold[lineCounter].text.strip()).split()
@@ -212,7 +213,7 @@ for i in dirs:
                 currGoldLine[wordsOfThisLineCounter] = currGoldLine[wordsOfThisLineCounter][:-3]
 
             if ("tag" in allWords[j].attrib and allWords[j].attrib["tag"] in ["punctuation", "foreign"]) or isWholeWordForeign(allWords[j].text):
-                currGoldLine[wordsOfThisLineCounter] = allWords[j].text
+                currGoldLine[wordsOfThisLineCounter] = currLineSourceWords[wordsOfThisLineCounter].text
 
             if "#" in currGoldLine[wordsOfThisLineCounter]:
                 currGoldLine[wordsOfThisLineCounter] = fixHash(currGoldLine[wordsOfThisLineCounter], allWords[j].text)

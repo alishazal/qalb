@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Usage: python3 extract_sample_of_data.py [sample_size]
+Usage: python3 extract_sample_of_data.py [file-name.english] [sample_size]
 """
 
 import xml.etree.ElementTree as ET
@@ -17,8 +17,8 @@ def getNoOfWordsInList(l):
 
     return count
 
-sampleSize = int(sys.argv[1])
-english = open("sms_chat_data.english", "w")
+english = open(sys.argv[1], "w")
+sampleSize = int(sys.argv[2])
 
 files = os.listdir("data")
 files.sort()
