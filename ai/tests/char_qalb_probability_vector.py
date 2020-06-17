@@ -114,7 +114,7 @@ else:
     line = line.split()
     word = tuple(DATASET.tokenize(line[0]))
     WORD_TO_IX[word] = i
-    print("The embedding for", i, "is", list(map(float, line[1:])))
+    print("The line is", line, "and the embedding for word", word, "with id", i, "is", list(map(float, line[1:])))
     WORD_EMBEDDINGS.append(list(map(float, line[1:])))
 
 # Space embedding is set randomly with standard normal initialization.
