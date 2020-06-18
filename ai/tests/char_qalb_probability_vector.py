@@ -143,8 +143,8 @@ def add_word_ids(batch):
           try:
             word_id = WORD_TO_IX[tuple(char_ids)]
           except KeyError:
-            print("WARNING: Unknown word at index", i)
-            print(DATASET.untokenize(char_ids))
+            # print("WARNING: Unknown word at index", i)
+            # print(DATASET.untokenize(char_ids))
             word_id = WORD_TO_IX[space_chid]
           for char_id in char_ids:
             new_seq.append([char_id, word_id])
