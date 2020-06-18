@@ -110,7 +110,7 @@ if FLAGS.word_embeddings == 'concat':
   #   WORD_EMBEDDINGS.append(embedding)
   pass
 else:
-  vec_lines = open(FLAGS.word_embeddings, "r").read()
+  vec_lines = open("ai/datasets/data/gigaword/" + FLAGS.word_embeddings, "r").read()
   for i, line in enumerate(vec_lines.splitlines()):
     line = line.split()
     word = tuple(DATASET.tokenize(line[0]))
