@@ -4,7 +4,6 @@
 Usage: python3 extract_sample_of_data.py [orig-file.arabizi] [orig-file.gold] [new-file.arabizi] [new-file.gold] [sample_size]
 """
 
-import xml.etree.ElementTree as ET
 import os
 import sys
 import random
