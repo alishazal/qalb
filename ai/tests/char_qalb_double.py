@@ -102,15 +102,7 @@ WORD_EMBEDDINGS_2 = []
 WORD_TO_IX = {}
 
 if FLAGS.word_embeddings == 'concat':
-  narrow_lines = os.popen(unix_comm.format('narrow')).read().splitlines()
-  wide_lines = os.popen(unix_comm.format('wide')).read().splitlines()
-  # The words should be the exact same for both lists, in the exact same order.
-  for i in range(len(narrow_lines)):
-    narrow_line = narrow_lines[i].split()
-    word = tuple(DATASET.tokenize(narrow_line[0]))
-    WORD_TO_IX[word] = i
-    embedding = list(map(float, narrow_line[1:] + wide_lines[i].split()[1:]))
-    WORD_EMBEDDINGS.append(embedding)
+  pass
 else:
   count = 0
   vec_lines = os.popen(unix_comm.format(FLAGS.word_embeddings)).read()
