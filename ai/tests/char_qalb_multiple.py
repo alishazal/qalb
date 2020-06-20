@@ -148,7 +148,7 @@ else:
     if word not in WORD_TO_IX:
       WORD_TO_IX[word] = count
       count += 1
-    WORD_EMBEDDINGS_4.append(list(map(float, line[1:])))
+    WORD_EMBEDDINGS_4.append(list(map(float, line[2:])))
 
 # Space embedding is set randomly with standard normal initialization.
 WORD_TO_IX[DATASET.type_to_ix[(' ',)]] = count
