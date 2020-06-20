@@ -14,7 +14,7 @@ from scipy import exp
 from scipy.special import lambertw
 
 from ai.datasets import QALB
-from ai.models import CharSeq2SeqDouble
+from ai.models import CharSeq2SeqDoubleFasttext
 
 file = sys.argv[1]
 
@@ -193,7 +193,7 @@ def train():
     np.random.seed(1)
     # During training we use beam width 1. There are lots of complications on
     # the implementation, e.g. only tiling during inference.
-    m = CharSeq2SeqDouble(
+    m = CharSeq2SeqDoubleFasttext(
       num_types=DATASET.num_types(),
       max_encoder_length=FLAGS.max_sentence_length,
       max_decoder_length=FLAGS.max_sentence_length,
@@ -366,7 +366,7 @@ def decode():
     random.seed(1)
     np.random.seed(1)
 
-    m = CharSeq2SeqDouble(
+    m = CharSeq2SeqDoubleFasttext(
       num_types=DATASET.num_types(),
       max_encoder_length=max_length, max_decoder_length=max_length,
       pad_id=DATASET.type_to_ix['_PAD'],

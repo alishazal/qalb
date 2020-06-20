@@ -7,7 +7,7 @@ tf.set_random_seed(1)
 from ai.models import BaseModel
 
 
-class CharSeq2SeqDouble(BaseModel):
+class CharSeq2SeqDoubleFasttext(BaseModel):
   
   def __init__(self, num_types=0, max_encoder_length=99, max_decoder_length=99,
                pad_id=0, eos_id=1, go_id=2,
