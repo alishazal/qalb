@@ -147,7 +147,8 @@ class CharSeq2SeqProbVector(BaseModel):
   
   def get_embeddings(self, ids):
     """Get the concatenation of word and char embeddings of the given ids."""
-    print("IDS ARE:", ids)
+    print("THE IDS FOR CHARS IS:", ids[:, :, 0])
+    print("THE IDS FOR WORDS IS:", ids[:, :, 1])
     char_embeds = tf.nn.embedding_lookup(self.char_embeddings, ids[:, :, 0])
     word_embeds = tf.nn.embedding_lookup(self.word_embeddings, ids[:, :, 1])
     return tf.concat([char_embeds, word_embeds], -1)
