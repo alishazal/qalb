@@ -54,8 +54,6 @@ tf.app.flags.DEFINE_string('word_embeddings_2', None, "Will search for FastText"
                            "model at `ai/datasets/data/gigaword/???.bin`.")
 tf.app.flags.DEFINE_string('word_embeddings_3', None, "Will search for FastText"
                            "model at `ai/datasets/data/gigaword/???.bin`.")
-tf.app.flags.DEFINE_string('word_embeddings_4', None, "Will search for FastText"
-                           "model at `ai/datasets/data/gigaword/???.bin`.")
 tf.app.flags.DEFINE_boolean('train_word_embeddings', False, "Backprop on/off.")
 
 
@@ -104,7 +102,6 @@ unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
 WORD_EMBEDDINGS = []
 WORD_EMBEDDINGS_2 = []
 WORD_EMBEDDINGS_3 = []
-WORD_EMBEDDINGS_4 = []
 WORD_TO_IX = {}
 
 if FLAGS.word_embeddings == 'concat':
@@ -139,8 +136,6 @@ else:
       WORD_TO_IX[word] = count
       count += 1
     WORD_EMBEDDINGS_3.append(list(map(float, line[1:])))
-
-  # Bigram probability vectors
 
 # Space embedding is set randomly with standard normal initialization.
 WORD_TO_IX[DATASET.type_to_ix[(' ',)]] = count
@@ -228,7 +223,7 @@ def train():
       dropout=FLAGS.dropout, max_grad_norm=FLAGS.max_grad_norm, beam_size=1,
       epsilon=FLAGS.epsilon, beta1=FLAGS.beta1, beta2=FLAGS.beta2,
       word_embeddings=WORD_EMBEDDINGS, word_embeddings_2=WORD_EMBEDDINGS_2,
-      word_embeddings_3=WORD_EMBEDDINGS_3, word_embeddings_4=WORD_EMBEDDINGS_4,
+      word_embeddings_3=WORD_EMBEDDINGS_3,
       train_word_embeddings=FLAGS.train_word_embeddings, restore=FLAGS.restore,
       model_name=FLAGS.model_name)
   
@@ -398,8 +393,7 @@ def decode():
       bidirectional_mode=FLAGS.bidirectional_mode,
       use_lstm=FLAGS.use_lstm, attention=FLAGS.attention,
       beam_size=FLAGS.beam_size, word_embeddings=WORD_EMBEDDINGS,
-      word_embeddings_2=WORD_EMBEDDINGS_2, word_embeddings_3=WORD_EMBEDDINGS_3, 
-      word_embeddings_4=WORD_EMBEDDINGS_4,
+      word_embeddings_2=WORD_EMBEDDINGS_2, word_embeddings_3=WORD_EMBEDDINGS_3,
       restore=True, model_name=FLAGS.model_name)
   
   with tf.Session(graph=graph) as sess:
