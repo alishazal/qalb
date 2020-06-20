@@ -128,7 +128,7 @@ else:
     WORD_EMBEDDINGS_2.append(list(map(float, line[1:])))
 
   # Unigram probability vectors
-  vec_lines_3 = open("ai/datasets/data/gigaword/" + FLAGS.word_embeddings, "r").read()
+  vec_lines_3 = open("ai/datasets/data/gigaword/" + FLAGS.word_embeddings_3, "r").read()
   for i, line in enumerate(vec_lines_3.splitlines()):
     line = line.split()
     word = tuple(DATASET.tokenize(line[0]))

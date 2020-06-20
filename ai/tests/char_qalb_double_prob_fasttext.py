@@ -115,7 +115,7 @@ else:
     count += 1
 
   # Unigram probability vectors
-  vec_lines_2 = open("ai/datasets/data/gigaword/" + FLAGS.word_embeddings, "r").read()
+  vec_lines_2 = open("ai/datasets/data/gigaword/" + FLAGS.word_embeddings_2, "r").read()
   for i, line in enumerate(vec_lines_2.splitlines()):
     line = line.split()
     word = tuple(DATASET.tokenize(line[0]))
