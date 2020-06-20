@@ -15,7 +15,7 @@ class CharSeq2SeqProbVector(BaseModel):
                bidirectional_encoder=False, bidirectional_mode='add',
                use_lstm=False, attention=None, dropout=1., max_grad_norm=5.,
                epsilon=1e-8, beta1=.9, beta2=.999, beam_size=1,
-               word_embeddings=None, train_word_embeddings=False, **kw):
+               word_embeddings=None, word_embeddings_2=None, train_word_embeddings=False, **kw):
     """Build the entire computational graph.
     
     Keyword args:
@@ -76,6 +76,11 @@ class CharSeq2SeqProbVector(BaseModel):
       self.word_embeddings = tf.Variable(
         word_embeddings, trainable=train_word_embeddings, dtype=tf.float32,
         name='word_embeddings')
+
+    with tf.variable_scope('embeddings'):
+      self.word_embeddings_2 = tf.Variable(
+        word_embeddings_2, trainable=train_word_embeddings, dtype=tf.float32,
+        name='word_embeddings_2')
     
     super().__init__(**kw)
   
@@ -151,7 +156,8 @@ class CharSeq2SeqProbVector(BaseModel):
     print("THE IDS FOR WORDS IS:", ids[:, :, 1])
     char_embeds = tf.nn.embedding_lookup(self.char_embeddings, ids[:, :, 0])
     word_embeds = tf.nn.embedding_lookup(self.word_embeddings, ids[:, :, 1])
-    return tf.concat([char_embeds, word_embeds], -1)
+    word_embeds_2 = tf.nn.embedding_lookup(self.word_embeddings_2, ids[:, :, 1])
+    return tf.concat([char_embeds, word_embeds, word_embeds_2], -1)
   
   def get_char_embeddings(self, ids):
     """Get only the character embeddings of the given ids.."""

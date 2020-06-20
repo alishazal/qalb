@@ -54,6 +54,8 @@ tf.app.flags.DEFINE_string('word_embeddings_2', None, "Will search for FastText"
                            "model at `ai/datasets/data/gigaword/???.bin`.")
 tf.app.flags.DEFINE_string('word_embeddings_3', None, "Will search for FastText"
                            "model at `ai/datasets/data/gigaword/???.bin`.")
+tf.app.flags.DEFINE_string('word_embeddings_4', None, "Will search for FastText"
+                           "model at `ai/datasets/data/gigaword/???.bin`.")
 tf.app.flags.DEFINE_boolean('train_word_embeddings', False, "Backprop on/off.")
 
 
@@ -102,6 +104,7 @@ unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
 WORD_EMBEDDINGS = []
 WORD_EMBEDDINGS_2 = []
 WORD_EMBEDDINGS_3 = []
+WORD_EMBEDDINGS_4 = []
 WORD_TO_IX = {}
 
 if FLAGS.word_embeddings == 'concat':
@@ -137,6 +140,16 @@ else:
       count += 1
     WORD_EMBEDDINGS_3.append(list(map(float, line[1:])))
 
+  # Bigram probability vectors
+  vec_lines_4 = open("ai/datasets/data/gigaword/" + FLAGS.word_embeddings_4, "r").read()
+  for i, line in enumerate(vec_lines_4.splitlines()):
+    line = line.split()
+    word = tuple(DATASET.tokenize(line[0]) + DATASET.tokenize(line[1]))
+    if word not in WORD_TO_IX:
+      WORD_TO_IX[word] = count
+      count += 1
+    WORD_EMBEDDINGS_4.append(list(map(float, line[1:])))
+
 # Space embedding is set randomly with standard normal initialization.
 WORD_TO_IX[DATASET.type_to_ix[(' ',)]] = count
 WORD_EMBEDDINGS.append([
@@ -145,16 +158,20 @@ WORD_EMBEDDINGS_2.append([
   random.normalvariate(0, 1) for _ in range(len(WORD_EMBEDDINGS_2[0]))])
 WORD_EMBEDDINGS_3.append([
   random.normalvariate(0, 1) for _ in range(len(WORD_EMBEDDINGS_3[0]))])
+WORD_EMBEDDINGS_4.append([
+  random.normalvariate(0, 1) for _ in range(len(WORD_EMBEDDINGS_4[0]))])
 
 def add_word_ids(batch):
   """Turn each character id to a pair (id, word_id)."""
+
   space_chid = DATASET.type_to_ix[(' ',)]
   space_like = [
     space_chid,
     DATASET.type_to_ix['_PAD'], DATASET.type_to_ix['_EOS'], DATASET.type_to_ix['<bos>'],
-    DATASET.type_to_ix['<eos>'], DATASET.type_to_ix['<bow>'], DATASET.type_to_ix['<eow>'],
-    DATASET.type_to_ix['[+]'], DATASET.type_to_ix['[-]']]
+    DATASET.type_to_ix['<eos>'], DATASET.type_to_ix['<bow>'], DATASET.type_to_ix['<eow>']]
   new_batch = []
+  count = 0
+  prev_word_ids = []
   for seq in batch:
     new_seq = []
     # This accumulates ids until we are ready to form the word
@@ -170,13 +187,20 @@ def add_word_ids(batch):
             # print(DATASET.untokenize(char_ids))
             word_id = WORD_TO_IX[space_chid]
           for char_id in char_ids:
-            new_seq.append([char_id, word_id])
+            if count > 0:
+              bigram_id = prev_word_ids[-1] + word_id
+              prev_word_ids.append(word_id)
+            else:
+              prev_word_ids.append(word_id)
+              bigram_id = prev_word_ids[-1]
+            new_seq.append([char_id, word_id, bigram_id])
         # Add the space id and empty the char ids.
         new_seq.append([space_chid, WORD_TO_IX[space_chid]])
         char_ids = []
       else:
         char_ids.append(id_)
     new_batch.append(new_seq)
+    count += 1
   return np.array(new_batch)
 
 
@@ -223,7 +247,7 @@ def train():
       dropout=FLAGS.dropout, max_grad_norm=FLAGS.max_grad_norm, beam_size=1,
       epsilon=FLAGS.epsilon, beta1=FLAGS.beta1, beta2=FLAGS.beta2,
       word_embeddings=WORD_EMBEDDINGS, word_embeddings_2=WORD_EMBEDDINGS_2,
-      word_embeddings_3=WORD_EMBEDDINGS_3,
+      word_embeddings_3=WORD_EMBEDDINGS_3, word_embeddings_4=WORD_EMBEDDINGS_4,
       train_word_embeddings=FLAGS.train_word_embeddings, restore=FLAGS.restore,
       model_name=FLAGS.model_name)
   
@@ -394,6 +418,7 @@ def decode():
       use_lstm=FLAGS.use_lstm, attention=FLAGS.attention,
       beam_size=FLAGS.beam_size, word_embeddings=WORD_EMBEDDINGS,
       word_embeddings_2=WORD_EMBEDDINGS_2, word_embeddings_3=WORD_EMBEDDINGS_3,
+      word_embeddings_4=WORD_EMBEDDINGS_4,
       restore=True, model_name=FLAGS.model_name)
   
   with tf.Session(graph=graph) as sess:

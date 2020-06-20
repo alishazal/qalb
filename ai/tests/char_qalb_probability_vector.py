@@ -50,6 +50,8 @@ tf.app.flags.DEFINE_float('beta1', .9, "First order moment decay.")
 tf.app.flags.DEFINE_float('beta2', .999, "Second order moment decay.")
 tf.app.flags.DEFINE_string('word_embeddings', None, "Will search for FastText"
                            "model at `ai/datasets/data/gigaword/???.bin`.")
+tf.app.flags.DEFINE_string('word_embeddings_2', None, "Will search for FastText"
+                           "model at `ai/datasets/data/gigaword/???.bin`.")
 tf.app.flags.DEFINE_boolean('train_word_embeddings', False, "Backprop on/off.")
 
 
@@ -91,36 +93,43 @@ DATASET = QALB(
 cat_files = ('ai/datasets/data/arabizi/{0}-train.{1} '
              'ai/datasets/data/arabizi/{0}-dev.{1} '.format(file , FLAGS.extension))
 
-# unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
-#              r"'!seen[$0]++' | ../../fastText/fasttext print-word-vectors "
-#              r"ai/datasets/data/gigaword/{}.bin") % cat_files
+unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
+             r"'!seen[$0]++' | ../../fastText/fasttext print-word-vectors "
+             r"ai/datasets/data/gigaword/{}.bin") % cat_files
 
 WORD_EMBEDDINGS = []
+WORD_EMBEDDINGS_2 = []
 WORD_TO_IX = {}
 
 if FLAGS.word_embeddings == 'concat':
-  # narrow_lines = os.popen(unix_comm.format('narrow')).read().splitlines()
-  # wide_lines = os.popen(unix_comm.format('wide')).read().splitlines()
-  # # The words should be the exact same for both lists, in the exact same order.
-  # for i in range(len(narrow_lines)):
-  #   narrow_line = narrow_lines[i].split()
-  #   word = tuple(DATASET.tokenize(narrow_line[0]))
-  #   WORD_TO_IX[word] = i
-  #   embedding = list(map(float, narrow_line[1:] + wide_lines[i].split()[1:]))
-  #   WORD_EMBEDDINGS.append(embedding)
   pass
 else:
+  count = 0
   vec_lines = open("ai/datasets/data/gigaword/" + FLAGS.word_embeddings, "r").read()
   for i, line in enumerate(vec_lines.splitlines()):
     line = line.split()
     word = tuple(DATASET.tokenize(line[0]))
     WORD_TO_IX[word] = i
     WORD_EMBEDDINGS.append(list(map(float, line[1:])))
+    count += 1
+
+  # Fasttext embedding
+  vec_lines_2 = os.popen(unix_comm.format(FLAGS.word_embeddings_2)).read()
+  for i, line in enumerate(vec_lines_2.splitlines()):
+    line = line.split()
+    word = tuple(DATASET.tokenize(line[0]))
+    if word not in WORD_TO_IX:
+      WORD_TO_IX[word] = i
+      count += 1
+    WORD_EMBEDDINGS_2.append(list(map(float, line[1:])))
+    count += 1
 
 # Space embedding is set randomly with standard normal initialization.
-WORD_TO_IX[DATASET.type_to_ix[(' ',)]] = len(WORD_EMBEDDINGS)
+WORD_TO_IX[DATASET.type_to_ix[(' ',)]] = count
 WORD_EMBEDDINGS.append([
   random.normalvariate(0, 1) for _ in range(len(WORD_EMBEDDINGS[0]))])
+WORD_EMBEDDINGS_2.append([
+  random.normalvariate(0, 1) for _ in range(len(WORD_EMBEDDINGS_2[0]))])
 
 
 def add_word_ids(batch):
@@ -129,8 +138,7 @@ def add_word_ids(batch):
   space_like = [
     space_chid,
     DATASET.type_to_ix['_PAD'], DATASET.type_to_ix['_EOS'], DATASET.type_to_ix['<bos>'],
-    DATASET.type_to_ix['<eos>'], DATASET.type_to_ix['<bow>'], DATASET.type_to_ix['<eow>'],
-    DATASET.type_to_ix['[+]'], DATASET.type_to_ix['[-]']]
+    DATASET.type_to_ix['<eos>'], DATASET.type_to_ix['<bow>'], DATASET.type_to_ix['<eow>']]
   new_batch = []
   for seq in batch:
     new_seq = []
@@ -199,7 +207,7 @@ def train():
       use_lstm=FLAGS.use_lstm, attention=FLAGS.attention, 
       dropout=FLAGS.dropout, max_grad_norm=FLAGS.max_grad_norm, beam_size=1,
       epsilon=FLAGS.epsilon, beta1=FLAGS.beta1, beta2=FLAGS.beta2,
-      word_embeddings=WORD_EMBEDDINGS,
+      word_embeddings=WORD_EMBEDDINGS, word_embeddings_2=WORD_EMBEDDINGS_2,
       train_word_embeddings=FLAGS.train_word_embeddings, restore=FLAGS.restore,
       model_name=FLAGS.model_name)
   
@@ -369,6 +377,7 @@ def decode():
       bidirectional_mode=FLAGS.bidirectional_mode,
       use_lstm=FLAGS.use_lstm, attention=FLAGS.attention,
       beam_size=FLAGS.beam_size, word_embeddings=WORD_EMBEDDINGS,
+      word_embeddings_2=WORD_EMBEDDINGS_2,
       restore=True, model_name=FLAGS.model_name)
   
   with tf.Session(graph=graph) as sess:

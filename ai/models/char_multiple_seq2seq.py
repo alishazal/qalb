@@ -16,7 +16,7 @@ class CharSeq2SeqMultiple(BaseModel):
                use_lstm=False, attention=None, dropout=1., max_grad_norm=5.,
                epsilon=1e-8, beta1=.9, beta2=.999, beam_size=1,
                word_embeddings=None, word_embeddings_2=None,
-               word_embeddings_3=None, train_word_embeddings=False, **kw):
+               word_embeddings_3=None, word_embeddings_4=None, train_word_embeddings=False, **kw):
     """Build the entire computational graph.
     
     Keyword args:
@@ -87,6 +87,11 @@ class CharSeq2SeqMultiple(BaseModel):
       self.word_embeddings_3 = tf.Variable(
         word_embeddings_3, trainable=train_word_embeddings, dtype=tf.float32,
         name='word_embeddings_3')
+
+    with tf.variable_scope('embeddings'):
+      self.word_embeddings_4 = tf.Variable(
+        word_embeddings_4, trainable=train_word_embeddings, dtype=tf.float32,
+        name='word_embeddings_4')
     
     super().__init__(**kw)
   
@@ -162,7 +167,8 @@ class CharSeq2SeqMultiple(BaseModel):
     word_embeds = tf.nn.embedding_lookup(self.word_embeddings, ids[:, :, 1])
     word_embeds_2 = tf.nn.embedding_lookup(self.word_embeddings_2, ids[:, :, 1])
     word_embeds_3 = tf.nn.embedding_lookup(self.word_embeddings_3, ids[:, :, 1])
-    return tf.concat([char_embeds, word_embeds, word_embeds_2, word_embeds_3], -1)
+    word_embeds_4 = tf.nn.embedding_lookup(self.word_embeddings_4, ids[:, :, 2])
+    return tf.concat([char_embeds, word_embeds, word_embeds_2, word_embeds_3, word_embeds_4], -1)
   
   def get_char_embeddings(self, ids):
     """Get only the character embeddings of the given ids.."""
