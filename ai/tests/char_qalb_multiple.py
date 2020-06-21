@@ -193,8 +193,6 @@ def add_word_ids(batch):
             else:
               prev_word_ids.append(word_id)
               bigram_id = prev_word_ids[-1]
-            
-            print("printing IDS", char_id, "NOW WORD ID", word_id, "NOW BIGRAM ID", bigram_id)
             new_seq.append([char_id, word_id, bigram_id])
         # Add the space id and empty the char ids.
         new_seq.append([space_chid, WORD_TO_IX[space_chid]])
