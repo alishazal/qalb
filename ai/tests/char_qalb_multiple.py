@@ -306,6 +306,7 @@ def train():
         # Wrap into function to measure running time
         def train_step():
           try:
+            print("IS THE ERROR HERE", train_fd)
             sess.run(m.train_step, feed_dict=train_fd)
           except:
             print(batches[step % len(batches), :, 0].shape)
