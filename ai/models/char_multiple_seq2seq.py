@@ -109,7 +109,7 @@ class CharSeq2SeqMultiple(BaseModel):
     # Placeholders
     self.inputs = tf.placeholder(
       tf.int32, name='inputs',
-      shape=[self.batch_size, self.max_encoder_length, 3])
+      shape=[self.batch_size, self.max_encoder_length, None])
     self.labels = tf.placeholder(
       tf.int32, name='labels',
       shape=[self.batch_size, self.max_decoder_length])
