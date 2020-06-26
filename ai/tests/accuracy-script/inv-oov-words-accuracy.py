@@ -1,4 +1,4 @@
-# Usage python known-words-accuracy.py [pred.out] [unknown.out] [some.gold] [inv or oov]
+# Usage python inv-oov-words-accuracy.py [pred.out] [unknown.out] [some.gold] [inv or oov]
 
 import sys
 
