@@ -426,7 +426,7 @@ def decode():
           top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
           if top_line.strip() == "":
             result += "#"
-          else
+          else:
             result += top_line
         output_file.write(result + '\n')
         print("Output:", result, flush=True, end='\n\n')
