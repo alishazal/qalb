@@ -424,7 +424,10 @@ def decode():
           top_line = untokenize_batch(outputs)[0]
           # Sequences of text will only be repeated up to 5 times.
           top_line = re.sub(r'(.+?)\1{5,}', lambda m: m.group(1) * 5, top_line)
-          result += top_line
+          if top_line == "" or top_line == " ":
+            result += "#"
+          else
+            result += top_line
         output_file.write(result + '\n')
         print("Output:", result, flush=True, end='\n\n')
 
