@@ -70,6 +70,8 @@ parser.add_argument('--copy_marker', action="store", dest='copy_marker', default
 # need to know if the input_writing_system of the data is something other than latin so it doesn't convert everything
 # to hashtag
 parser.add_argument('--input_writing_system', action="store", dest='input_writing_system', default="latin")
+# Adding this flag so that ay-normalized evaluation is only run when the output language is arabic
+parser.add_argument('--output_language', action="store", dest='output_language', default="arabic")
 
 # ----------Seq2Seq MODEL FLAGS: Details of use and implementation in ai/tests/char_seq2seq.py----------
 # inintial learning rate
@@ -415,19 +417,18 @@ if args.predict:
 
 if args.evaluate_accuracy:
     exact_system_accuracy = accuracy(args.predict_output_file, args.predict_output_word_aligned_gold)
-    
-    create_ay_normalized_file(args.predict_output_file, "temp/ay_normalized_word_aligned_output")
-    create_ay_normalized_file(args.predict_output_word_aligned_gold, "temp/ay_normalized_word_aligned_gold")
-    ay_normalized_system_accuracy = accuracy("temp/ay_normalized_word_aligned_output", "temp/ay_normalized_word_aligned_gold")
+    if args.output_language == "arabic":
+        create_ay_normalized_file(args.predict_output_file, "temp/ay_normalized_word_aligned_output")
+        create_ay_normalized_file(args.predict_output_word_aligned_gold, "temp/ay_normalized_word_aligned_gold")
+        ay_normalized_system_accuracy = accuracy("temp/ay_normalized_word_aligned_output", "temp/ay_normalized_word_aligned_gold")
 
 if args.evaluate_bleu:
-
     create_file_with_plus_minus_tokens_removed(args.predict_output_file, "temp/sentence_aligned_output")
     exact_system_bleu = evaluate_bleu("temp/sentence_aligned_output", args.predict_output_sentence_aligned_gold)
-    
-    create_ay_normalized_file("temp/sentence_aligned_output", "temp/ay_normalized_sentence_aligned_output")
-    create_ay_normalized_file(args.predict_output_sentence_aligned_gold, "temp/ay_normalized_sentence_aligned_gold")
-    normalized_system_bleu = evaluate_bleu("temp/ay_normalized_sentence_aligned_output", "temp/ay_normalized_sentence_aligned_gold")
+    if args.output_language == "arabic":
+        create_ay_normalized_file("temp/sentence_aligned_output", "temp/ay_normalized_sentence_aligned_output")
+        create_ay_normalized_file(args.predict_output_sentence_aligned_gold, "temp/ay_normalized_sentence_aligned_gold")
+        normalized_system_bleu = evaluate_bleu("temp/ay_normalized_sentence_aligned_output", "temp/ay_normalized_sentence_aligned_gold")
 
 # Print accuracy and time stats
 print("\n")
