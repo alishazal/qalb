@@ -1,10 +1,3 @@
-"""
-Function -> preprocess(source):
-    > compression: repetitions over 2 => reduced to 2
-    > lowercase all letters
-    > accented letter => unaccented
-"""
-
 import sys
 import unicodedata as ud
 import re

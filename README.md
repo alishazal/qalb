@@ -2,6 +2,8 @@
 
 There are 4 components of this tool. We will demostrate the use of each component using the [LDC BOLT Egyptian Arabic SMS/Chat and Transliteration](https://catalog.ldc.upenn.edu/LDC2017T07) data to transliterate Arabizi to Arabic.
 
+This readme also contains a repository structure at the end.
+
 ## 1. Data Extraction from LDC XML Files
 Download the [data](https://catalog.ldc.upenn.edu/LDC2017T07) and unzip the downloaded file. The annotated Arabizi-Arabic transliterated parallel corpus resides in bolt_sms_chat_ara_src_transliteration/data/transliteration as folder as xml files. We use these for training and testing of our tool. There are also unannotated Arabizi-only files in bolt_sms_chat_ara_src_transliteration/data/source; these are used for training word-embeddings using Fasttext.
 
@@ -72,17 +74,18 @@ Now train word-embeddings on the unannotated arabizi data we extracted (without 
 # Preprocess
 
 cd ../ #move up one directory to come back to the root
-python3 ai/datasets/data/arabizi/preprocessArabizi.py splits_ldc/source/source-without-dev-test.arabizi splits_ldc/source/source-without-dev-test-preprocessed.arabizi
+python3 helpers/preprocess_fasttext_data.py --input_file=splits_ldc/source/source-without-dev-test.arabizi --output_file=splits_ldc/source/source-without-dev-test-preprocessed.arabizi
 
 # Word-embeddings training
-./fastText/fasttext skipgram -input splits_ldc/source/source-without-dev-test-preprocessed.arabizi -output ai/datasets/data/gigaword/arabizi_300_narrow -dim 300 -minn 2 -ws 2
+./fastText/fasttext skipgram -input splits_ldc/source/source-without-dev-test-preprocessed.arabizi -output pretrained_word_embeddings/arabizi_300_narrow -dim 300 -minn 2 -ws 2
 ```
 
 This will save a .bin files at the output directory specified in the command. This bin file will be used in training to feed pre-trained word embeddings.
 
 ## 2. Training
 
-
 ## 3. Prediction with Evaluation
 
 ## 4. Prediction without Evaluation
+
+# Repository Structure
