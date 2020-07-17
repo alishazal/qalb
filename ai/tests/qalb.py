@@ -1,4 +1,3 @@
-"""Testing setup for QALB shared task."""
 import io
 import os
 import sys
@@ -12,10 +11,15 @@ import numpy as np
 from scipy import exp
 from scipy.special import lambertw
 
-from ai.datasets import QALB
+from ai.datasets import ALLDATASET
 from ai.models import Seq2Seq
 
-file = sys.argv[1]
+# INPUT FILES
+tf.app.flags.DEFINE_string('train_input', None, "Path to train input file")
+tf.app.flags.DEFINE_string('train_output', None, "Path to train output file")
+tf.app.flags.DEFINE_string('dev_input', None, "Path to dev input file")
+tf.app.flags.DEFINE_string('dev_output', None, "Path to dev output file")
+
 
 # HYPERPARAMETERS
 tf.app.flags.DEFINE_float('lr', 0.0001, "Initial learning rate.")
@@ -54,16 +58,12 @@ tf.app.flags.DEFINE_integer('num_steps_per_eval', 50, "Number of steps to wait"
                             " before running the graph with the dev set.")
 tf.app.flags.DEFINE_integer('max_epochs', 40, "Number of epochs to run"
                             " (0 = no limit).")
-tf.app.flags.DEFINE_string('extension', 'arabizi', "Data files' extension.")
-tf.app.flags.DEFINE_string('decode', None, "Set to a path to run on a file.")
-tf.app.flags.DEFINE_string('output_path', os.path.join('output', 'result.txt'),
-                           "Name of the output file with decoding results.")
+tf.app.flags.DEFINE_string('predict_input_file', None, "Path to prediction input file")
+tf.app.flags.DEFINE_string('output_path', None, "Name of the output file with decoding results.")
 tf.app.flags.DEFINE_boolean('restore', True, "Whether to restore the model.")
-tf.app.flags.DEFINE_string('model_name', None, "Name of the output directory.")
-
+tf.app.flags.DEFINE_string('model_output_dir', None, "Name of the output directory.")
 
 FLAGS = tf.app.flags.FLAGS
-
 
 def untokenize_batch(dataset, id_batch):
   """Return the UTF-8 sequences of the given batch of ids."""
@@ -83,9 +83,12 @@ def levenshtein(proposed, gold, normalize=False):
 
 def train():
   """Run a loop that continuously trains the model."""
-  print("Building dynamic character-level QALB data...", flush=True)
-  dataset = QALB(
-    file, parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+  print("Building dynamic character-level ALLDATASET data...", flush=True)
+  dataset = ALLDATASET(
+    train_input=FLAGS.train_input, train_output=FLAGS.train_output,
+    dev_input=FLAGS.dev_input, dev_output=FLAGS.dev_output,
+    predict_input_file=FLAGS.predict_input_file, 
+    parse_repeated=FLAGS.parse_repeated,
     shuffle=True, max_input_length=FLAGS.max_sentence_length,
     max_label_length=FLAGS.max_sentence_length)
   
@@ -116,7 +119,7 @@ def train():
       use_lstm=FLAGS.use_lstm, attention=FLAGS.attention, 
       dropout=FLAGS.dropout, max_grad_norm=FLAGS.max_grad_norm, beam_size=1,
       epsilon=FLAGS.epsilon, beta1=FLAGS.beta1, beta2=FLAGS.beta2,
-      restore=FLAGS.restore, model_name=FLAGS.model_name)
+      restore=FLAGS.restore, model_output_dir=FLAGS.model_output_dir)
   
   # Allow TensorFlow to resort back to CPU when we try to set an operation to
   # a GPU where there's only a CPU implementation, rather than crashing.
@@ -244,15 +247,18 @@ def train():
 
 def decode():
   """Run a blind test on the file with path given by the `decode` flag."""
-  with io.open(FLAGS.decode, encoding='utf-8') as test_file:
+  with io.open(FLAGS.predict_input_file, encoding='utf-8') as test_file:
     lines = test_file.readlines()
     # Get the largest sentence length to set an upper bound to the decoder.
     max_length = FLAGS.max_sentence_length
     # max_length = max([len(line) for line in lines])
     
-  print("Building dynamic character-level QALB data...", flush=True)
-  dataset = QALB(
-    file, parse_repeated=FLAGS.parse_repeated, extension=FLAGS.extension,
+  print("Building dynamic character-level ALLDATASET data...", flush=True)
+  dataset = ALLDATASET(
+    train_input=FLAGS.train_input, train_output=FLAGS.train_output,
+    dev_input=FLAGS.dev_input, dev_output=FLAGS.dev_output,
+    predict_input_file=FLAGS.predict_input_file, 
+    parse_repeated=FLAGS.parse_repeated,
     max_input_length=max_length, max_label_length=max_length)
   
   print("Building computational graph...", flush=True)
@@ -276,7 +282,7 @@ def decode():
       bidirectional_encoder=FLAGS.bidirectional_encoder,
       bidirectional_mode=FLAGS.bidirectional_mode,
       use_lstm=FLAGS.use_lstm, attention=FLAGS.attention,
-      beam_size=FLAGS.beam_size, restore=True, model_name=FLAGS.model_name)
+      beam_size=FLAGS.beam_size, restore=True, model_output_dir=FLAGS.model_output_dir)
   
   with tf.Session(graph=graph) as sess:
     print("Restoring model...", flush=True)
@@ -336,11 +342,11 @@ def decode():
 
 def main(_):
   """Callee of `tf.app.run` the method."""
-  if not FLAGS.model_name:
+  if not FLAGS.model_output_dir:
     raise ValueError(
-      "Undefined model name. Perhaps you forgot to set the --model_name flag?")
+      "Undefined model output directory. Perhaps you forgot to set the --model_output_dir flag?")
   
-  if FLAGS.decode:
+  if FLAGS.predict_input_file:
     decode()
   else:
     train()

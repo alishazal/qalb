@@ -11,4 +11,4 @@
    than adding the file names to the `__all__` variable as usual."""
 
 from ai.datasets.base_dataset import BaseDataset
-from ai.datasets.qalb import QALB
+from ai.datasets.dataset import ALLDATASET

@@ -1,5 +1,3 @@
-"""TODO: add descriptive module docstring."""
-
 import random
 random.seed(1)
 
