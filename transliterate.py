@@ -123,6 +123,7 @@ parser.add_argument('--max_epochs', action="store", dest='max_epochs', default=4
 # restore an existing model or not
 parser.add_argument('--restore', action="store", dest='restore', default=True)
 # ----------//Seq2Seq MODEL FLAGS: Details of use and implementation in ai/tests/char_qalb.py//----------
+
 args = parser.parse_args()
 
 def list_to_file(input_list, file_name):

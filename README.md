@@ -74,6 +74,7 @@ Now train word-embeddings on the unannotated arabizi data we extracted (without 
 # Preprocess
 
 cd ../ #move up one directory to come back to the root
+
 python3 helpers/preprocess_fasttext_data.py --input_file=splits_ldc/source/source-without-dev-test.arabizi --output_file=splits_ldc/source/source-without-dev-test-preprocessed.arabizi
 
 # Word-embeddings training
