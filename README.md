@@ -1,5 +1,21 @@
-# Transliteration Tool
+# Prerequisites
+It is very important to match the versions of the prerequisites mentioned below. These prereqs assume you have a GPU. If you don't, ignore tensorflow-gpu (and instead install tensorflow), cudatoolkit 8.0, and cudnn 6.0.21.
 
+- Python 3.6 and its following libraries:
+    - [camel-tools](https://camel-tools.readthedocs.io/en/latest/getting_started.html)
+    - tensorflow-gpu
+    - cudatoolkit 8.0
+    - cudnn 6.0.21
+    - editdistance
+    - nltk 3.5
+    - numpy
+    - pandas
+    - scipy
+- Anaconda 4.1.1
+- CUDA 8.0
+- GCC 4.9.3 (very important to match this version because of a grep command in )
+
+# Transliteration Tool
 There are 4 components of this tool. We will demostrate the use of each component using the [LDC BOLT Egyptian Arabic SMS/Chat and Transliteration](https://catalog.ldc.upenn.edu/LDC2017T07) data to transliterate Arabizi to Arabic.
 
 This readme also contains a repository structure at the end.

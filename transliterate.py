@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(description='This program rewrites (translitera
 # --model_name can take values "mle", "word2word", "line2line", or "hybrid"
 parser.add_argument('--model_name', action="store", dest='model_name', default="word2word")
 # --model_python_script specifies the path of the python script that runs the specific model
-parser.add_argument('--model_python_script', action="store", dest='model_python_script', default="ai/tests/char_qalb.py")
+parser.add_argument('--model_python_script', action="store", dest='model_python_script', default="ai/tests/char_seq2seq.py")
 # --train can take values True or False
 parser.add_argument('--train', action="store", dest="train", default=True)
 # --predict can take values True or False
@@ -71,7 +71,7 @@ parser.add_argument('--copy_marker', action="store", dest='copy_marker', default
 # to hashtag
 parser.add_argument('--input_writing_system', action="store", dest='input_writing_system', default="latin")
 
-# ----------Seq2Seq MODEL FLAGS: Details of use and implementation in ai/tests/char_qalb.py----------
+# ----------Seq2Seq MODEL FLAGS: Details of use and implementation in ai/tests/char_seq2seq.py----------
 # inintial learning rate
 parser.add_argument('--lr', action="store", dest='lr', default=0.0001)
 # batch size
@@ -122,7 +122,7 @@ parser.add_argument('--num_steps_per_eval', action="store", dest='num_steps_per_
 parser.add_argument('--max_epochs', action="store", dest='max_epochs', default=40)
 # restore an existing model or not
 parser.add_argument('--restore', action="store", dest='restore', default=True)
-# ----------//Seq2Seq MODEL FLAGS: Details of use and implementation in ai/tests/char_qalb.py//----------
+# ----------//Seq2Seq MODEL FLAGS: Details of use and implementation in ai/tests/char_seq2seq.py//----------
 
 args = parser.parse_args()
 
