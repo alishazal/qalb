@@ -66,5 +66,5 @@ class BaseModel(object):
     """Save the model's variables for later training or evaluation."""
     sess = tf.get_default_session()
     self.saver.save(
-      sess, os.path.join('output', self.model_output_dir, filename),
+      sess, os.path.join(self.model_output_dir, filename),
       global_step=sess.run(self.global_step))

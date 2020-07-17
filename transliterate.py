@@ -13,6 +13,8 @@ from camel_tools.utils.charmap import CharMapper
 
 ar2bw = CharMapper.builtin_mapper('ar2bw')
 
+def is_bool(s):
+    return str(s) != 'False'
 parser = argparse.ArgumentParser(description='This program rewrites (transliterates) from one language script to another')
 
 # --model_name can take values "mle", "word2word", "line2line", or "hybrid"
@@ -20,13 +22,13 @@ parser.add_argument('--model_name', action="store", dest='model_name', default="
 # --model_python_script specifies the path of the python script that runs the specific model
 parser.add_argument('--model_python_script', action="store", dest='model_python_script', default="ai/tests/char_seq2seq.py")
 # --train can take values True or False
-parser.add_argument('--train', action="store", dest="train", default=True)
+parser.add_argument('--train', action="store", dest="train", default=True, type=is_bool)
 # --predict can take values True or False
-parser.add_argument('--predict', action="store", dest="predict", default=True)
+parser.add_argument('--predict', action="store", dest="predict", default=True, type=is_bool)
 # --evaluate_accuracy can take values True or False
-parser.add_argument('--evaluate_accuracy', action="store", dest="evaluate_accuracy", default=True)
+parser.add_argument('--evaluate_accuracy', action="store", dest="evaluate_accuracy", default=True, type=is_bool)
 # --evaluate_bleu can take values True or False
-parser.add_argument('--evaluate_bleu', action="store", dest="evaluate_bleu", default=True)
+parser.add_argument('--evaluate_bleu', action="store", dest="evaluate_bleu", default=True, type=is_bool)
 
 # --train_source_file takes the path to the source file for training
 parser.add_argument('--train_source_file', action="store", dest='train_source_file', default="splits_ldc/train/train-source.arabizi")
@@ -41,7 +43,7 @@ parser.add_argument('--alignment', action="store", dest='alignment', default="wo
 # --context is only for word2word models.
 parser.add_argument('--context', action="store", dest='context', default=1)
 # --include_fasttext checks if user wants to run fasttext
-parser.add_argument('--include_fasttext', action="store", dest='include_fasttext', default=True)
+parser.add_argument('--include_fasttext', action="store", dest='include_fasttext', default=True, type=is_bool)
 # --fasttext_executable takes the path to the fasttext executable file needed to load pretrained word embeddings
 parser.add_argument('--fasttext_executable', action="store", dest='fasttext_executable', default="./fastText/fasttext")
 # --fasttext_bin_file takes the path to the fasttext .bin file which has the pretrained word embeddings
@@ -57,12 +59,14 @@ parser.add_argument('--predict_output_file', action="store", dest='predict_outpu
 parser.add_argument('--predict_output_word_aligned_gold', action="store", dest='predict_output_word_aligned_gold', default="splits_ldc/dev/dev-word-aligned-target.gold")
 # --predict_output_sentence_aligned_gold takes the path of the sentence-aligned gold file for evaluation of system's prediction
 parser.add_argument('--predict_output_sentence_aligned_gold', action="store", dest='predict_output_sentence_aligned_gold', default="splits_ldc/dev/dev-sentence-aligned-target.gold")
+# --evaluation_results_file takes the path where the evaluation result will be stored
+parser.add_argument('--evaluation_results_file', action="store", dest='evaluation_results_file', default="output/evaluations/word2word_evaluation_results.txt")
 
 # --preprocess can take values True or False
-parser.add_argument('--preprocess', action="store", dest='preprocess', default=True)
+parser.add_argument('--preprocess', action="store", dest='preprocess', default=True, type=is_bool)
 # --copy_unchanged_tokens can take values True or False. It protects words that should remain untouched in
 # training input and training output by converting training output to a special marker (default: "#"; see below flag).
-parser.add_argument('--copy_unchanged_tokens', action="store", dest='copy_unchanged_tokens', default=True)
+parser.add_argument('--copy_unchanged_tokens', action="store", dest='copy_unchanged_tokens', default=True, type=is_bool)
 # special marker that signals that a token should be copied as is in the output
 parser.add_argument('--copy_marker', action="store", dest='copy_marker', default="#")
 # --input_writing_system could be "latin" or "other"; we need this flag for the preprocesser because it assumes latin
@@ -85,11 +89,11 @@ parser.add_argument('--hidden_size', action="store", dest='hidden_size', default
 # number of RNN layers
 parser.add_argument('--rnn_layers', action="store", dest='rnn_layers', default=2)
 # whether to use a bidirectional RNN in the encoder's 1st layer
-parser.add_argument('--bidirectional_encoder', action="store", dest='bidirectional_encoder', default=True)
+parser.add_argument('--bidirectional_encoder', action="store", dest='bidirectional_encoder', default=True, type=is_bool)
 # --bidirectional_mode options are add, concat or project
 parser.add_argument('--bidirectional_mode', action="store", dest='bidirectional_mode', default="add")
 # set --use_lstm to false to use GRUs
-parser.add_argument('--use_lstm', action="store", dest='use_lstm', default=False)
+parser.add_argument('--use_lstm', action="store", dest='use_lstm', default=False, type=is_bool)
 # --attention options are luong or bahdanau
 parser.add_argument('--attention', action="store", dest='attention', default="luong")
 # probability for dropout on the RNN's non-recurrent connections
@@ -105,7 +109,7 @@ parser.add_argument('--final_p_sample', action="store", dest='final_p_sample', d
 # duration in epochs of schedule sampling (determines the rate of change)
 parser.add_argument('--epochs_p_sample', action="store", dest='epochs_p_sample', default=20)
 # Set False for sigmoid decay
-parser.add_argument('--linear_p_sample', action="store", dest='linear_p_sample', default=True)
+parser.add_argument('--linear_p_sample', action="store", dest='linear_p_sample', default=True, type=is_bool)
 # Set this greater than 1 to compress contiguous patterns in the data pipeline
 parser.add_argument('--parse_repeated', action="store", dest='parse_repeated', default=0)
 # Denominator constant
@@ -115,7 +119,7 @@ parser.add_argument('--beta1', action="store", dest='beta1', default=0.9)
 # second order moment decay
 parser.add_argument('--beta2', action="store", dest='beta2', default=0.999)
 # backpropagation on or off; default is off (False)
-parser.add_argument('--train_word_embeddings', action="store", dest='train_word_embeddings', default=False)
+parser.add_argument('--train_word_embeddings', action="store", dest='train_word_embeddings', default=False, type=is_bool)
 # maximum number of characters in input and output
 parser.add_argument('--max_sentence_length', action="store", dest='max_sentence_length', default=110)
 # number of steps to wait before running the graph with the dev set
@@ -123,7 +127,7 @@ parser.add_argument('--num_steps_per_eval', action="store", dest='num_steps_per_
 # number of epochs to run; 0 = no limit
 parser.add_argument('--max_epochs', action="store", dest='max_epochs', default=40)
 # restore an existing model or not
-parser.add_argument('--restore', action="store", dest='restore', default=True)
+parser.add_argument('--restore', action="store", dest='restore', default=True, type=is_bool)
 # ----------//Seq2Seq MODEL FLAGS: Details of use and implementation in ai/tests/char_seq2seq.py//----------
 
 args = parser.parse_args()
@@ -375,7 +379,9 @@ if args.train:
         if args.alignment != "word":
             raise ValueError("MLE is only allowed for word-aligned lines")
         ml_train_input_lines, ml_train_output_lines = preprocess(train_source_file_lines, train_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, None, args.input_writing_system)
-        
+        list_to_file(ml_train_input_lines, f"temp/{args.model_name}_training_train_input")
+        list_to_file(ml_train_output_lines, f"temp/{args.model_name}_training_train_output")
+
         print("Starting MLE training")
         training_start_time = time.time()
         train_mle(ml_train_input_lines, ml_train_output_lines, args.model_output_path)  
@@ -415,24 +421,33 @@ if args.predict:
     prediction_final_output = postprocess()
     list_to_file(prediction_final_output, args.predict_output_file)
 
-if args.evaluate_accuracy:
-    exact_system_accuracy = accuracy(args.predict_output_file, args.predict_output_word_aligned_gold)
-    if args.output_language == "arabic":
-        create_ay_normalized_file(args.predict_output_file, "temp/ay_normalized_word_aligned_output")
-        create_ay_normalized_file(args.predict_output_word_aligned_gold, "temp/ay_normalized_word_aligned_gold")
-        ay_normalized_system_accuracy = accuracy("temp/ay_normalized_word_aligned_output", "temp/ay_normalized_word_aligned_gold")
+if args.evaluate_accuracy or args.evaluate_bleu:
+    evaluation_results_file = open(args.evaluation_results_file, "w")
 
-if args.evaluate_bleu:
-    create_file_with_plus_minus_tokens_removed(args.predict_output_file, "temp/sentence_aligned_output")
-    exact_system_bleu = evaluate_bleu("temp/sentence_aligned_output", args.predict_output_sentence_aligned_gold)
-    if args.output_language == "arabic":
-        create_ay_normalized_file("temp/sentence_aligned_output", "temp/ay_normalized_sentence_aligned_output")
-        create_ay_normalized_file(args.predict_output_sentence_aligned_gold, "temp/ay_normalized_sentence_aligned_gold")
-        normalized_system_bleu = evaluate_bleu("temp/ay_normalized_sentence_aligned_output", "temp/ay_normalized_sentence_aligned_gold")
+    if args.evaluate_accuracy:
+        exact_system_accuracy = accuracy(args.predict_output_file, args.predict_output_word_aligned_gold)
+        evaluation_results_file.write(f"Exact Accuracy: {str(round(exact_system_accuracy, 2))}%\n")
+        if args.output_language == "arabic":
+            create_ay_normalized_file(args.predict_output_file, "temp/ay_normalized_word_aligned_output")
+            create_ay_normalized_file(args.predict_output_word_aligned_gold, "temp/ay_normalized_word_aligned_gold")
+            ay_normalized_system_accuracy = accuracy("temp/ay_normalized_word_aligned_output", "temp/ay_normalized_word_aligned_gold")
+            evaluation_results_file.write(f"Exact Accuracy: {str(round(ay_normalized_system_accuracy, 2))}%\n")
+
+    if args.evaluate_bleu:
+        create_file_with_plus_minus_tokens_removed(args.predict_output_file, "temp/sentence_aligned_output")
+        exact_system_bleu = evaluate_bleu("temp/sentence_aligned_output", args.predict_output_sentence_aligned_gold)
+        evaluation_results_file.write(f"Exact BLEU Score: {exact_system_bleu}\n")
+        if args.output_language == "arabic":
+            create_ay_normalized_file("temp/sentence_aligned_output", "temp/ay_normalized_sentence_aligned_output")
+            create_ay_normalized_file(args.predict_output_sentence_aligned_gold, "temp/ay_normalized_sentence_aligned_gold")
+            normalized_system_bleu = evaluate_bleu("temp/ay_normalized_sentence_aligned_output", "temp/ay_normalized_sentence_aligned_gold")
+            evaluation_results_file.write(f"AY-Normalized BLEU Score: {normalized_system_bleu}\n")
+    
+    evaluation_results_file.close()
 
 # Print accuracy and time stats
 print("\n")
 if args.train: print(f"Training time was {total_training_time} seconds")
 if args.predict: print(f"Prediction time was {total_prediction_time} seconds")
 if args.evaluate_accuracy: print(f"Exact Accuracy: {round(exact_system_accuracy, 2)}% \nAY-Normalized Accuracy: {round(ay_normalized_system_accuracy, 2)}%")
-if args.evaluate_bleu: print(f"Exact BLEU: {exact_system_bleu} \nAY-Normalized BLEU: {normalized_system_bleu}")
+if args.evaluate_bleu: print(f"Exact BLEU Score: {exact_system_bleu} \nAY-Normalized BLEU Score: {normalized_system_bleu}")
