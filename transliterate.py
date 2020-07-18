@@ -397,19 +397,23 @@ if args.train:
     "Dev source file and dev target file have unequal number of lines")
 
     if args.model_name != "mle":
-        if args.include_fasttext:
-            #Preproces test input file for loading preword embeddings
-            ml_test_input_lines, _ = preprocess(test_source_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, args.context, args.input_writing_system)
-            list_to_file(ml_test_input_lines, f"temp/{args.model_name}_training_test_input")
         if args.model_name == "word2word":
             ml_train_input_lines, ml_train_output_lines, train_lines_record = preprocess(train_source_file_lines, train_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, args.context, args.input_writing_system)
             ml_dev_input_lines, ml_dev_output_lines, dev_lines_record = preprocess(dev_source_file_lines, dev_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, args.context, args.input_writing_system)
             create_temp_input_output_files(ml_train_input_lines, ml_train_output_lines, ml_dev_input_lines, ml_dev_output_lines)
             create_temp_line_record_files(train_lines_record, dev_lines_record)
+            if args.include_fasttext:
+                #Preproces test input file for loading preword embeddings
+                ml_test_input_lines, _ = preprocess(test_source_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, args.context, args.input_writing_system)
+                list_to_file(ml_test_input_lines, f"temp/{args.model_name}_training_test_input")
         else:
             ml_train_input_lines, ml_train_output_lines = preprocess(train_source_file_lines, train_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, None, args.input_writing_system)
             ml_dev_input_lines, ml_dev_output_lines = preprocess(dev_source_file_lines, dev_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, None, args.input_writing_system)
             create_temp_input_output_files(ml_train_input_lines, ml_train_output_lines, ml_dev_input_lines, ml_dev_output_lines)
+            if args.include_fasttext:
+                #Preproces test input file for loading preword embeddings
+                ml_test_input_lines = preprocess(test_source_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, None, args.input_writing_system)
+                list_to_file(ml_test_input_lines, f"temp/{args.model_name}_training_test_input")
 
         print("Starting Seq2Seq training")
         training_start_time = time.time()
