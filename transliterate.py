@@ -195,12 +195,18 @@ def train_seq2seq():
 def predict_seq2seq():
     if args.include_fasttext:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
-        f"--model_output_dir={args.model_output_path} --fasttext_executable={args.fasttext_executable} "
+        f"--train_input=temp/{args.model_name}_training_train_input "
+        f"--train_output=temp/{args.model_name}_training_train_output --dev_input=temp/{args.model_name}_training_dev_input "
+        f"--dev_output=temp/{args.model_name}_training_dev_output --model_output_dir={args.model_output_path} "
+        f"--fasttext_executable={args.fasttext_executable} "
         f"--word_embeddings={args.fasttext_bin_file} --train_word_embeddings={args.train_word_embeddings} "
         f"--predict_input_file=temp/{args.model_name}_prediction_ml_input --predict_output_file={args.predict_output_file}")    
     else:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
-        f"--model_output_dir={args.model_output_path} --predict_input_file=temp/{args.model_name}_prediction_ml_input " 
+        f"--train_input=temp/{args.model_name}_training_train_input "
+        f"--train_output=temp/{args.model_name}_training_train_output --dev_input=temp/{args.model_name}_training_dev_input "
+        f"--dev_output=temp/{args.model_name}_training_dev_output --model_output_dir={args.model_output_path} "
+        f"--predict_input_file=temp/{args.model_name}_prediction_ml_input " 
         f"--predict_output_file={args.predict_output_file}")
 
     run_command(command)
@@ -410,6 +416,7 @@ if args.predict:
 
     else:
         ml_input_lines = preprocess(predict_input_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, None, args.input_writing_system)
+        list_to_file(ml_input_lines, f"temp/{args.model_name}_prediction_ml_input")
         mle_model = load_mle()
 
         print("Starting MLE prediction")
@@ -428,19 +435,19 @@ if args.evaluate_accuracy or args.evaluate_bleu:
         exact_system_accuracy = accuracy(args.predict_output_file, args.predict_output_word_aligned_gold)
         evaluation_results_file.write(f"Exact Accuracy: {str(round(exact_system_accuracy, 2))}%\n")
         if args.output_language == "arabic":
-            create_ay_normalized_file(args.predict_output_file, "temp/ay_normalized_word_aligned_output")
-            create_ay_normalized_file(args.predict_output_word_aligned_gold, "temp/ay_normalized_word_aligned_gold")
-            ay_normalized_system_accuracy = accuracy("temp/ay_normalized_word_aligned_output", "temp/ay_normalized_word_aligned_gold")
-            evaluation_results_file.write(f"Exact Accuracy: {str(round(ay_normalized_system_accuracy, 2))}%\n")
+            create_ay_normalized_file(args.predict_output_file, f"temp/{args.model_name}_ay_normalized_word_aligned_output")
+            create_ay_normalized_file(args.predict_output_word_aligned_gold, f"temp/{args.model_name}_ay_normalized_word_aligned_gold")
+            ay_normalized_system_accuracy = accuracy(f"temp/{args.model_name}_ay_normalized_word_aligned_output", f"temp/{args.model_name}_ay_normalized_word_aligned_gold")
+            evaluation_results_file.write(f"AY-Normalized Accuracy: {str(round(ay_normalized_system_accuracy, 2))}%\n")
 
     if args.evaluate_bleu:
-        create_file_with_plus_minus_tokens_removed(args.predict_output_file, "temp/sentence_aligned_output")
-        exact_system_bleu = evaluate_bleu("temp/sentence_aligned_output", args.predict_output_sentence_aligned_gold)
+        create_file_with_plus_minus_tokens_removed(args.predict_output_file, f"temp/{args.model_name}_sentence_aligned_output")
+        exact_system_bleu = evaluate_bleu(f"temp/{args.model_name}_sentence_aligned_output", args.predict_output_sentence_aligned_gold)
         evaluation_results_file.write(f"Exact BLEU Score: {exact_system_bleu}\n")
         if args.output_language == "arabic":
-            create_ay_normalized_file("temp/sentence_aligned_output", "temp/ay_normalized_sentence_aligned_output")
-            create_ay_normalized_file(args.predict_output_sentence_aligned_gold, "temp/ay_normalized_sentence_aligned_gold")
-            normalized_system_bleu = evaluate_bleu("temp/ay_normalized_sentence_aligned_output", "temp/ay_normalized_sentence_aligned_gold")
+            create_ay_normalized_file(f"temp/{args.model_name}_sentence_aligned_output", f"temp/{args.model_name}_ay_normalized_sentence_aligned_output")
+            create_ay_normalized_file(args.predict_output_sentence_aligned_gold, f"temp/{args.model_name}_ay_normalized_sentence_aligned_gold")
+            normalized_system_bleu = evaluate_bleu(f"temp/{args.model_name}_ay_normalized_sentence_aligned_output", f"temp/{args.model_name}_ay_normalized_sentence_aligned_gold")
             evaluation_results_file.write(f"AY-Normalized BLEU Score: {normalized_system_bleu}\n")
     
     evaluation_results_file.close()

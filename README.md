@@ -15,6 +15,8 @@ It is important to match the versions of the prerequisites mentioned below in or
 - CUDA 8.0
 - GCC 4.9.3 (very important to match this version because of a grep command in seq2seq python scripts)
 
+We ran our seq2seq systems with the GPU [NVIDIA Tesla V100 PCIe 32 GB](https://www.techpowerup.com/gpu-specs/tesla-v100-pcie-32-gb.c3184) on NYU Abu Dhabi's High Performance Computing cluster, known as Dalma. We set the memory flag to 30GB and set the max. time to 12 hours for each run. All other Dalma flags were kept as default. Our .sh scripts can be seen in the file dalma_scripts.sh
+
 # Repository Structure
 
 # Transliteration Tool
