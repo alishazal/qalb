@@ -20,6 +20,7 @@ tf.app.flags.DEFINE_string('train_input', None, "Path to train input file")
 tf.app.flags.DEFINE_string('train_output', None, "Path to train output file")
 tf.app.flags.DEFINE_string('dev_input', None, "Path to dev input file")
 tf.app.flags.DEFINE_string('dev_output', None, "Path to dev output file")
+tf.app.flags.DEFINE_string('test_input', None, "Path to test input file")
 
 # HYPERPARAMETERS
 tf.app.flags.DEFINE_float('lr', 0.0001, "Initial learning rate.")
@@ -89,10 +90,12 @@ DATASET = ALLDATASET(
 
 
 # Get all unique word embeddings from the given FastText model.
+# The following files should remain the same in training and prediction to avoid an error due to unequal number of 
+# word embedding vector lines.
 cat_files = []
 if FLAGS.train_input: cat_files.append(FLAGS.train_input)
 if FLAGS.dev_input: cat_files.append(FLAGS.dev_input)
-if FLAGS.predict_input_file: cat_files.append(FLAGS.predict_input_file)
+if FLAGS.test_input: cat_files.append(FLAGS.test_input)
 
 cat_files = " ".join(cat_files)
 unix_comm = (r"cat %s| grep -Po '(?<=^|\s)[^\s]*(?=\s|$)' | awk "
@@ -125,7 +128,6 @@ WORD_TO_IX[DATASET.type_to_ix[(' ',)]] = len(WORD_EMBEDDINGS)
 WORD_EMBEDDINGS.append([
   random.normalvariate(0, 1) for _ in range(len(WORD_EMBEDDINGS[0]))])
 
-
 def add_word_ids(batch):
   """Turn each character id to a pair (id, word_id)."""
   space_chid = DATASET.type_to_ix[(' ',)]
@@ -145,8 +147,8 @@ def add_word_ids(batch):
           try:
             word_id = WORD_TO_IX[tuple(char_ids)]
           except KeyError:
-            print("WARNING: Unknown word at index", i)
-            print(DATASET.untokenize(char_ids))
+            # print("WARNING: Unknown word at index", i)
+            # print(DATASET.untokenize(char_ids))
             word_id = WORD_TO_IX[space_chid]
           for char_id in char_ids:
             new_seq.append([char_id, word_id])
@@ -380,11 +382,13 @@ def decode():
       "Restored model (global step {})".format(m.global_step.eval()),
       flush=True)
     with io.open(FLAGS.predict_output_file, 'w', encoding='utf-8') as output_file:
+      line_counter = 1
       for i, line in enumerate(lines):
+        if line_counter % 500 == 0:
+          print(f"Predicted {line_counter} out of {len(lines)} lines")
+
         if line.endswith('\n'):
          line = line[:-1]
-        print("Line", i, "input:")
-        print(line)
 
         number_of_chars = len(line)
         completely_divisble = number_of_chars % FLAGS.max_sentence_length == 0
@@ -432,7 +436,7 @@ def decode():
           else:
             result += top_line
         output_file.write(result + '\n')
-        print("Output:", result, flush=True, end='\n\n')
+        line_counter += 1
 
 if FLAGS.predict_input_file:
   decode()

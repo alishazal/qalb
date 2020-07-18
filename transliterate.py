@@ -39,6 +39,8 @@ parser.add_argument('--train_target_file', action="store", dest='train_target_fi
 parser.add_argument('--dev_source_file', action="store", dest='dev_source_file', default="splits_ldc/dev/dev-source.arabizi")
 # --dev_target_file takes the path to the dev target file used during training
 parser.add_argument('--dev_target_file', action="store", dest='dev_target_file', default="splits_ldc/dev/dev-word-aligned-target.gold")
+# --test_source_file takes the path to the test source file used during training for loading word_embeddings
+parser.add_argument('--test_source_file', action="store", dest='test_source_file', default="splits_ldc/test/test-source.arabizi")
 # --alignment takes the values word or sentence
 parser.add_argument('--alignment', action="store", dest='alignment', default="word")
 # --context is only for word2word models.
@@ -69,6 +71,9 @@ parser.add_argument('--prediction_loaded_model_training_dev_input', action="stor
 # --prediction_loaded_model_training_dev_output takes the path to the training dev-set output file that was
 # used to train the model that we're loading for prediction
 parser.add_argument('--prediction_loaded_model_training_dev_output', action="store", dest='prediction_loaded_model_training_dev_output', default="temp/word2word_training_dev_output")
+# --prediction_loaded_model_training_test_input takes the path to the training test-set input file that was
+# used to train the model that we're loading for prediction. We're assuming the test file was used in training to load word embeddings
+parser.add_argument('--prediction_loaded_model_training_test_input', action="store", dest='prediction_loaded_model_training_test_input', default="temp/word2word_training_test_input")
 # --predict_input_file takes the path to the input file for prediction
 parser.add_argument('--predict_input_file', action="store", dest='predict_input_file', default="splits_ldc/dev/dev-source.arabizi")
 # --predict_output_file takes the path where the prediction output file will be stored
@@ -200,7 +205,8 @@ def train_seq2seq():
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
         f"--train_input=temp/{args.model_name}_training_train_input "
         f"--train_output=temp/{args.model_name}_training_train_output --dev_input=temp/{args.model_name}_training_dev_input "
-        f"--dev_output=temp/{args.model_name}_training_dev_output --model_output_dir={args.model_output_path} "
+        f"--dev_output=temp/{args.model_name}_training_dev_output --test_input=temp/{args.model_name}_training_test_input "
+        f"--model_output_dir={args.model_output_path} "
         f"--fasttext_executable={args.fasttext_executable} --word_embeddings={args.fasttext_bin_file} "
         f"--train_word_embeddings={args.train_word_embeddings} "
         f"{get_default_flags_string()}")    
@@ -218,7 +224,8 @@ def predict_seq2seq():
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
         f"--train_input={args.prediction_loaded_model_training_train_input} "
         f"--train_output={args.prediction_loaded_model_training_train_output} --dev_input={args.prediction_loaded_model_training_dev_input} "
-        f"--dev_output={args.prediction_loaded_model_training_dev_output} --model_output_dir={args.model_output_path} "
+        f"--dev_output={args.prediction_loaded_model_training_dev_output} --test_input={args.prediction_loaded_model_training_test_input} "
+        f"--model_output_dir={args.model_output_path} "
         f"--fasttext_executable={args.fasttext_executable} "
         f"--word_embeddings={args.fasttext_bin_file} --train_word_embeddings={args.train_word_embeddings} "
         f"--predict_input_file=temp/{args.model_name}_prediction_ml_input --predict_output_file={args.predict_output_file}")    
@@ -379,6 +386,10 @@ if args.train:
     dev_target_file = open(args.dev_target_file, "r")
     dev_target_file_lines = dev_target_file.readlines()
     dev_target_file.close()
+    # Open test files
+    test_source_file = open(args.test_source_file, "r")
+    test_source_file_lines = test_source_file.readlines()
+    test_source_file.close()
 
     if len(train_source_file_lines) != len(train_target_file_lines): raise ValueError(
     "Train source file and train target file have unequal number of lines")
@@ -386,6 +397,10 @@ if args.train:
     "Dev source file and dev target file have unequal number of lines")
 
     if args.model_name != "mle":
+        if args.include_fasttext:
+            #Preproces test input file for loading preword embeddings
+            ml_test_input_lines, _ = preprocess(test_source_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, args.context, args.input_writing_system)
+            list_to_file(ml_test_input_lines, f"temp/{args.model_name}_training_test_input")
         if args.model_name == "word2word":
             ml_train_input_lines, ml_train_output_lines, train_lines_record = preprocess(train_source_file_lines, train_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, args.context, args.input_writing_system)
             ml_dev_input_lines, ml_dev_output_lines, dev_lines_record = preprocess(dev_source_file_lines, dev_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, args.context, args.input_writing_system)

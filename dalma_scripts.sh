@@ -13,10 +13,6 @@ module load anaconda/2-4.1.1
 module load cuda/8.0
 module load gcc/4.9.3
 source activate capstone-gpu
-# Preprocess the fasttext training input data
-python3 helpers/preprocess_fasttext_data.py --input_file=splits_ldc/source/source-without-dev-test.arabizi --output_file=splits_ldc/source/source-without-dev-test-preprocessed.arabizi
-# Word-embeddings training
-./fastText/fasttext skipgram -input splits_ldc/source/source-without-dev-test-preprocessed.arabizi -output pretrained_word_embeddings/arabizi_300_narrow -dim 300 -minn 2 -ws 2
 # Run complete word2word system; it is the default so we dont need to pass any flags
 python3 transliterate.py
 
