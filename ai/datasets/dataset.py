@@ -36,20 +36,19 @@ class ALLDATASET(BaseDataset):
     self.max_input_length = max_input_length
     self.max_label_length = max_label_length
     self.parse_repeated = parse_repeated
-    # Prepare training data
-    if self.shuffle:
-      print("Training input path is:", self.train_input)
-      train_labels = self.maybe_flatten_gold(self.train_output)
-      with io.open(self.train_input, encoding='utf-8') as train_file:
-        self.train_pairs = self.make_pairs(train_file.readlines(), train_labels)
-      # Lock the addition of new characters into the data-- this way, we simulate
-      # a real testing environment with possible _UNK tokens.
-      self.max_types = self.num_types()
-      # Prepare validation data
-      valid_labels = self.maybe_flatten_gold(self.dev_output)
-      print("Dev input path is:", self.dev_input)
-      with io.open(self.dev_input, encoding='utf-8') as valid_file:
-        self.valid_pairs = self.make_pairs(valid_file.readlines(), valid_labels)
+    # Prepare data
+    print("Training input path is:", self.train_input)
+    train_labels = self.maybe_flatten_gold(self.train_output)
+    with io.open(self.train_input, encoding='utf-8') as train_file:
+      self.train_pairs = self.make_pairs(train_file.readlines(), train_labels)
+    # Lock the addition of new characters into the data-- this way, we simulate
+    # a real testing environment with possible _UNK tokens.
+    self.max_types = self.num_types()
+    # Prepare validation data
+    valid_labels = self.maybe_flatten_gold(self.dev_output)
+    print("Dev input path is:", self.dev_input)
+    with io.open(self.dev_input, encoding='utf-8') as valid_file:
+      self.valid_pairs = self.make_pairs(valid_file.readlines(), valid_labels)
   
   def untokenize(self, tokens, join_str=''):
     result = super().untokenize(tokens, join_str=join_str)

@@ -30,6 +30,7 @@ parser.add_argument('--evaluate_accuracy', action="store", dest="evaluate_accura
 # --evaluate_bleu can take values True or False
 parser.add_argument('--evaluate_bleu', action="store", dest="evaluate_bleu", default=True, type=is_bool)
 
+#TRAINING
 # --train_source_file takes the path to the source file for training
 parser.add_argument('--train_source_file', action="store", dest='train_source_file', default="splits_ldc/train/train-source.arabizi")
 # --train_target_file takes the path to the target file for training
@@ -51,6 +52,23 @@ parser.add_argument('--fasttext_bin_file', action="store", dest='fasttext_bin_fi
 # --model_output_path takes the path to store the model and its associated files during training. This is used during
 # prediction
 parser.add_argument('--model_output_path', action="store", dest='model_output_path', default="output/models/word2word_model")
+
+# PREDICTION
+# ---- For cases where the model was trained somewhere other than our system we have the following 4 flags to 
+# get the data the model was trained on to load fasttext word embeddings of that data. Of course, in this case,
+# the user will have to provide their own fasttext bin file too using the --fasttext_bin_file flag above. ----
+# --prediction_loaded_model_training_train_input takes the path to the training train-set input file that was
+# used to train the model that we're loading for prediction
+parser.add_argument('--prediction_loaded_model_training_train_input', action="store", dest='prediction_loaded_model_training_train_input', default="temp/word2word_training_train_input")
+# --prediction_loaded_model_training_train_output takes the path to the training train-set output file that was
+# used to train the model that we're loading for prediction
+parser.add_argument('--prediction_loaded_model_training_train_output', action="store", dest='prediction_loaded_model_training_train_output', default="temp/word2word_training_train_output")
+# --prediction_loaded_model_training_dev_input takes the path to the training dev-set input file that was
+# used to train the model that we're loading for prediction
+parser.add_argument('--prediction_loaded_model_training_dev_input', action="store", dest='prediction_loaded_model_training_dev_input', default="temp/word2word_training_dev_input")
+# --prediction_loaded_model_training_dev_output takes the path to the training dev-set output file that was
+# used to train the model that we're loading for prediction
+parser.add_argument('--prediction_loaded_model_training_dev_output', action="store", dest='prediction_loaded_model_training_dev_output', default="temp/word2word_training_dev_output")
 # --predict_input_file takes the path to the input file for prediction
 parser.add_argument('--predict_input_file', action="store", dest='predict_input_file', default="splits_ldc/dev/dev-source.arabizi")
 # --predict_output_file takes the path where the prediction output file will be stored
@@ -59,9 +77,12 @@ parser.add_argument('--predict_output_file', action="store", dest='predict_outpu
 parser.add_argument('--predict_output_word_aligned_gold', action="store", dest='predict_output_word_aligned_gold', default="splits_ldc/dev/dev-word-aligned-target.gold")
 # --predict_output_sentence_aligned_gold takes the path of the sentence-aligned gold file for evaluation of system's prediction
 parser.add_argument('--predict_output_sentence_aligned_gold', action="store", dest='predict_output_sentence_aligned_gold', default="splits_ldc/dev/dev-sentence-aligned-target.gold")
+
+# EVALUATION
 # --evaluation_results_file takes the path where the evaluation result will be stored
 parser.add_argument('--evaluation_results_file', action="store", dest='evaluation_results_file', default="output/evaluations/word2word_evaluation_results.txt")
 
+# PREPROCESSING
 # --preprocess can take values True or False
 parser.add_argument('--preprocess', action="store", dest='preprocess', default=True, type=is_bool)
 # --copy_unchanged_tokens can take values True or False. It protects words that should remain untouched in
@@ -195,17 +216,17 @@ def train_seq2seq():
 def predict_seq2seq():
     if args.include_fasttext:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
-        f"--train_input=temp/{args.model_name}_training_train_input "
-        f"--train_output=temp/{args.model_name}_training_train_output --dev_input=temp/{args.model_name}_training_dev_input "
-        f"--dev_output=temp/{args.model_name}_training_dev_output --model_output_dir={args.model_output_path} "
+        f"--train_input={args.prediction_loaded_model_training_train_input} "
+        f"--train_output={args.prediction_loaded_model_training_train_output} --dev_input={args.prediction_loaded_model_training_dev_input} "
+        f"--dev_output={args.prediction_loaded_model_training_dev_output} --model_output_dir={args.model_output_path} "
         f"--fasttext_executable={args.fasttext_executable} "
         f"--word_embeddings={args.fasttext_bin_file} --train_word_embeddings={args.train_word_embeddings} "
         f"--predict_input_file=temp/{args.model_name}_prediction_ml_input --predict_output_file={args.predict_output_file}")    
     else:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
-        f"--train_input=temp/{args.model_name}_training_train_input "
-        f"--train_output=temp/{args.model_name}_training_train_output --dev_input=temp/{args.model_name}_training_dev_input "
-        f"--dev_output=temp/{args.model_name}_training_dev_output --model_output_dir={args.model_output_path} "
+        f"--train_input={args.prediction_loaded_model_training_train_input} "
+        f"--train_output={args.prediction_loaded_model_training_train_output} --dev_input={args.prediction_loaded_model_training_dev_input} "
+        f"--dev_output={args.prediction_loaded_model_training_dev_output} --model_output_dir={args.model_output_path} "
         f"--predict_input_file=temp/{args.model_name}_prediction_ml_input " 
         f"--predict_output_file={args.predict_output_file}")
 
