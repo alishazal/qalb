@@ -385,7 +385,7 @@ def decode():
       line_counter = 1
       for i, line in enumerate(lines):
         if line_counter % 500 == 0:
-          print(f"Predicted {line_counter} out of {len(lines)} lines")
+          print(f"Predicted {line_counter} out of {len(lines)} lines", flush=True)
 
         if line.endswith('\n'):
          line = line[:-1]

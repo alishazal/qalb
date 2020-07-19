@@ -78,14 +78,14 @@ parser.add_argument('--prediction_loaded_model_training_test_input', action="sto
 parser.add_argument('--predict_input_file', action="store", dest='predict_input_file', default="splits_ldc/dev/dev-source.arabizi")
 # --predict_output_file takes the path where the prediction output file will be stored
 parser.add_argument('--predict_output_file', action="store", dest='predict_output_file', default="output/predictions/word2word-dev.out")
+
+# EVALUATION
 # --predict_output_word_aligned_gold takes the path of the word-aligned gold file for evaluation of system's prediction
 parser.add_argument('--predict_output_word_aligned_gold', action="store", dest='predict_output_word_aligned_gold', default="splits_ldc/dev/dev-word-aligned-target.gold")
 # --predict_output_sentence_aligned_gold takes the path of the sentence-aligned gold file for evaluation of system's prediction
 parser.add_argument('--predict_output_sentence_aligned_gold', action="store", dest='predict_output_sentence_aligned_gold', default="splits_ldc/dev/dev-sentence-aligned-target.gold")
-
-# EVALUATION
 # --evaluation_results_file takes the path where the evaluation result will be stored
-parser.add_argument('--evaluation_results_file', action="store", dest='evaluation_results_file', default="output/evaluations/word2word_evaluation_results.txt")
+parser.add_argument('--evaluation_results_file', action="store", dest='evaluation_results_file', default="output/evaluations/word2word_dev_evaluation_results.txt")
 
 # PREPROCESSING
 # --preprocess can take values True or False
