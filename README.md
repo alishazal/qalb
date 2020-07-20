@@ -17,6 +17,21 @@ It is important to match the versions of the prerequisites mentioned below in or
 We ran our seq2seq systems with the GPU [NVIDIA Tesla V100 PCIe 32 GB](https://www.techpowerup.com/gpu-specs/tesla-v100-pcie-32-gb.c3184) on NYU Abu Dhabi's High Performance Computing cluster, known as Dalma. We set the memory flag to 30GB and set the max. time to 12 hours for each run. All other Dalma flags were kept as default. The .sh scripts that we ran can be seen in the file dalma_scripts.sh
 
 # Repository Structure
+```
+ai/
+    datasets/ #module that takes care of preprocessing of any dataset
+    models/ #contains the model architectures of the fasttext-enabled seq2seq (named char_seq2seq) and simple seq2seq models
+    tests/ #contains the scripts that run the seq2seq systems, MLE system, and also contains the accuracy and bleu score scripts.
+helpers/ #contains helper files for the transliterate.py script that runs complete systems
+output/
+    evaluations/ #folder to store evaluation txt files
+    models/ #folder to store trained models
+    predictions/ #folder to store predictions of trained systems
+pretrained_word_embeddings/ #folder to store word embedding .bin files that are produced by Fasttext
+splits_ldc/ #contains the LDC data split into train, dev and test; there is also a source split that contains unannotated arabizi data which we use to train Fasttext.
+temp/ #folder to store machine learning input and output files that are produced during systems runs. These files are produced after preprocessing or ay-normalization.
+```
+
 
 # Transliteration Tool
 There are 4 components of this tool. We will demostrate the use of each component using the [LDC BOLT Egyptian Arabic SMS/Chat and Transliteration](https://catalog.ldc.upenn.edu/LDC2017T07) data to transliterate Arabizi to Arabic.
@@ -103,8 +118,36 @@ python3 helpers/preprocess_fasttext_data.py --input_file=splits_ldc/source/sourc
 This will save a .bin files at the output directory specified in the command. This bin file will be used in training to feed pre-trained word embeddings.
 
 ## 2. Training
+To train models on the data we've extracted run any of the following scripts depending on which model you're training:
+```unix
+# Word2Word
+python3 transliterate.py --predict=False --evaluate_accuracy=False --evaluate_bleu=False
+```
+```unix
+# Line2Line
+python3 transliterate.py --predict=False --evaluate_accuracy=False --evaluate_bleu=False --model_name=line2line --model_output_path=output/models/line2line_model --batch_size=1024
+```
+```unix
+# MLE
+python3 transliterate.py --predict=False --evaluate_accuracy=False --evaluate_bleu=False --model_name=mle --model_output_path=output/models/mle_model
+```
+
+To train on any other data, please look at the flags in transliterate.py and run the scripts by setting the appropriate flags for your data.
 
 ## 3. Prediction with Evaluation
+To predict the dev (or test) files using the trained models (and their temp files for word embeddings) and evaluate them using the gold files, run the following scripts according to your model prediction input/output files:
+```unix
+# Word2word
+python3 transliterate.py --train=False --predict_input_file=<prediction-input-file> --predict_output_file=<prediction-output-file> --predict_output_word_aligned_gold=<word-aligned-gold-file> --predict_output_sentence_aligned_gold=<sentence-aligned-gold-file> --evaluation_results_file=<evaluation-results-file>
+```
+```unix
+# Line2Line
+python3 transliterate.py --train=False --model_name=line2line --model_output_path=output/models/line2line_model --prediction_loaded_model_training_train_input=temp/line2line_training_train_input --prediction_loaded_model_training_train_output=temp/line2line_training_train_output --prediction_loaded_model_training_dev_input=temp/line2line_training_dev_input --prediction_loaded_model_training_dev_output=temp/line2line_training_dev_output --prediction_loaded_model_training_test_input=temp/line2line_training_test_input --predict_input_file=<prediction-input-file> --predict_output_file=<prediction-output-file> --predict_output_word_aligned_gold=<word-aligned-gold-file> --predict_output_sentence_aligned_gold=<sentence-aligned-gold-file> --evaluation_results_file=<evaluation-results-file> --batch_size=1024
+```
+```unix
+# MLE
+python3 transliterate.py --train=False --model_name=mle --model_output_path=output/models/mle_model --predict_input_file=<prediction-input-file> --predict_output_file=<prediction-output-file> --predict_output_word_aligned_gold=<word-aligned-gold-file> --predict_output_sentence_aligned_gold=<sentence-aligned-gold-file> --evaluation_results_file=<evaluation-results-file>
+```
 
 ## 4. Prediction without Evaluation
 To generate predictions given a file using our best model (word2word) settings run the following script replacing \<input\_file\> with the path to your input file and \<output\_file\> with the path to the output file. Note: we're assuming that (a). the word2word model has already been trained and is stored in output/models/word2word_model (b). the temp folder has files that were automatically generated by the system for training (if you dont have these, we'd suggest running a complete cycle of the word2word system using the script given under the "development set results" below)
