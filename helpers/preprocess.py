@@ -1,7 +1,6 @@
 import sys
 import unicodedata as ud
 import re
-from helpers.tag import tag
 
 def allNonAscii(word):
     for char in word:
@@ -97,23 +96,9 @@ def copy_tokens(input_line, output_line, copy_marker):
         
     return " ".join(new_output)
 
-def aligned_lines(all_input_lines, all_output_lines):
-    new_input_lines = []
-    new_output_lines = []
-    for line in range(len(all_input_lines)):
-        if len(all_input_lines[line].split()) == len(all_output_lines[line].split()):
-            new_input_lines.append(all_input_lines[line])
-            new_output_lines.append(all_output_lines[line])
-    
-    return new_input_lines, new_output_lines
-
 def preprocess(all_input_lines, all_output_lines, is_train, is_predict, alignment, copy_unchanged_tokens, 
-            copy_marker, model_name, context, writing_system):
+            copy_marker, writing_system):
     if is_train:
-        if alignment == "word":
-            # get lines which are word-aligned
-            all_input_lines, all_output_lines = aligned_lines(all_input_lines, all_output_lines)
-
         for line in range(len(all_input_lines)):
             input_line = all_input_lines[line].strip()
             output_line = all_output_lines[line].strip()
@@ -130,19 +115,12 @@ def preprocess(all_input_lines, all_output_lines, is_train, is_predict, alignmen
                 input_line, output_line = copyTextEmojiAndPunctuation(input_line, copy_marker, output_line, False)
             all_input_lines[line] = input_line
             all_output_lines[line] = output_line
-        # making sure input and output lines are aligned
-        all_input_lines, all_output_lines = aligned_lines(all_input_lines, all_output_lines)
-
-        if model_name == "word2word":
-            tagged_input_lines, tagged_output_lines, lines_record = tag(all_input_lines, all_output_lines, context, "train") 
-            return tagged_input_lines, tagged_output_lines, lines_record
 
         return all_input_lines, all_output_lines
 
     if is_predict:
         for line in range(len(all_input_lines)):
             input_line = all_input_lines[line].strip()
-
             #preprocessing
             input_line = compress(input_line, 2)
             input_line = input_line.lower()
@@ -152,9 +130,5 @@ def preprocess(all_input_lines, all_output_lines, is_train, is_predict, alignmen
                     input_line = copyNonAscii(input_line, copy_marker, None, True)
                 input_line = copyTextEmojiAndPunctuation(input_line, copy_marker, None, True)
             all_input_lines[line] = input_line
-
-        if model_name == "word2word":
-            tagged_input_lines, lines_record = tag(all_input_lines, [], context, "predict") 
-            return tagged_input_lines, lines_record
 
         return all_input_lines

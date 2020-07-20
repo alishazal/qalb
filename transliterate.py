@@ -78,6 +78,11 @@ parser.add_argument('--prediction_loaded_model_training_test_input', action="sto
 parser.add_argument('--predict_input_file', action="store", dest='predict_input_file', default="splits_ldc/dev/dev-source.arabizi")
 # --predict_output_file takes the path where the prediction output file will be stored
 parser.add_argument('--predict_output_file', action="store", dest='predict_output_file', default="output/predictions/word2word-dev.out")
+# PREDICTION FOR HYBRID MODEL
+# --mle_model_file takes the path to the mle_model file
+parser.add_argument('--mle_model_file', action="store", dest='mle_model_file', default="output/models/mle_model")
+# --word2word_model_dir takes the path to the word2word model directory
+parser.add_argument('--word2word_model_dir', action="store", dest='word2word_model_dir', default="output/models/word2word_model")
 
 # EVALUATION
 # --predict_output_word_aligned_gold takes the path of the word-aligned gold file for evaluation of system's prediction
@@ -158,6 +163,17 @@ parser.add_argument('--restore', action="store", dest='restore', default=True, t
 
 args = parser.parse_args()
 
+def aligned_lines(all_input_lines, all_output_lines):
+    new_input_lines = []
+    new_output_lines = []
+    for line in range(len(all_input_lines)):
+        if len(all_input_lines[line].split()) == len(all_output_lines[line].split()):
+            new_input_lines.append(all_input_lines[line])
+            new_output_lines.append(all_output_lines[line])
+    
+    return new_input_lines, new_output_lines
+
+
 #Takes a list and creates a file from it
 def list_to_file(input_list, file_name):
     f = open(file_name, "w")
@@ -172,12 +188,6 @@ def create_temp_input_output_files(ml_train_input_lines, ml_train_output_lines, 
     list_to_file(ml_train_output_lines, f"temp/{args.model_name}_training_train_output")
     list_to_file(ml_dev_input_lines, f"temp/{args.model_name}_training_dev_input")
     list_to_file(ml_dev_output_lines, f"temp/{args.model_name}_training_dev_output")
-
-# Store lines_record into files; lines_records are files that help in joining utterances after they have been broken by the context
-# window tagging feature
-def create_temp_line_record_files(train_lines_record, dev_lines_record):
-    list_to_file(train_lines_record, f"temp/{args.model_name}_training_train_lines_record")
-    list_to_file(dev_lines_record, f"temp/{args.model_name}_training_dev_lines_record")
 
 # Returns a string of flags that contain seq2seq hyperparameters
 def get_default_flags_string():
@@ -248,6 +258,9 @@ def predict_seq2seq():
 
     run_command(command)
 
+def predict_hybrid():
+    pass
+
 # Loads the MLE model into a dictionary; this dictionary is used for predictions
 def load_mle():
     model_file = open(args.model_output_path, "r")
@@ -293,27 +306,26 @@ def replace_hashes_from_source(source_line, hashes_line):
             hashes_line[i] = source_line[i]
     return " ".join(hashes_line)
 
-# Preprocessing function
-def postprocess():
+# Postprocessing function
+def postprocess(lines_record=None):
     output_file = open(args.predict_output_file, "r")
     output_file_lines = output_file.readlines()
     output_file.close()
 
     # join tagged lines
     if args.model_name == "word2word":
-        lines_record_file = open(f"temp/{args.model_name}_prediction_lines_record", "r")
-        lines_record_file_lines = lines_record_file.readlines()
-        lines_record_file.close()
-        output_file_lines = join_lines(output_file_lines, lines_record_file_lines)
+        output_file_lines = join_lines(output_file_lines, lines_record)
 
-    source_file = open(args.predict_input_file, "r")
-    source_file_lines = source_file.readlines()
-    source_file.close()
+    if args.preprocess:
+        source_file = open(args.predict_input_file, "r")
+        source_file_lines = source_file.readlines()
+        source_file.close()
     for line in range(len(output_file_lines)):
         # remove [+] tokens before foreign words
         output_file_lines[line] = remove_plus_before_foreign(output_file_lines[line])
         # fill in hashtags from source
-        output_file_lines[line] = replace_hashes_from_source(source_file_lines[line], output_file_lines[line])
+        if args.preprocess:
+            output_file_lines[line] = replace_hashes_from_source(source_file_lines[line], output_file_lines[line])
 
     return output_file_lines
 
@@ -392,45 +404,67 @@ if args.train:
 
     # Open training files
     train_source_file = open(args.train_source_file, "r")
-    train_source_file_lines = train_source_file.readlines()
+    ml_train_input_lines = train_source_file.readlines()
     train_source_file.close()
     train_target_file = open(args.train_target_file, "r")
-    train_target_file_lines = train_target_file.readlines()
+    ml_train_output_lines = train_target_file.readlines()
     train_target_file.close()
     # Open dev files
     dev_source_file = open(args.dev_source_file, "r")
-    dev_source_file_lines = dev_source_file.readlines()
+    ml_dev_input_lines = dev_source_file.readlines()
     dev_source_file.close()
     dev_target_file = open(args.dev_target_file, "r")
-    dev_target_file_lines = dev_target_file.readlines()
+    ml_dev_output_lines = dev_target_file.readlines()
     dev_target_file.close()
     # Open test files
     test_source_file = open(args.test_source_file, "r")
-    test_source_file_lines = test_source_file.readlines()
+    ml_test_input_lines = test_source_file.readlines()
     test_source_file.close()
 
-    if len(train_source_file_lines) != len(train_target_file_lines): raise ValueError(
+    if len(ml_train_input_lines) != len(ml_train_output_lines): raise ValueError(
     "Train source file and train target file have unequal number of lines")
-    if len(dev_source_file_lines) != len(dev_target_file_lines): raise ValueError(
+    if len(ml_dev_input_lines) != len(ml_dev_output_lines): raise ValueError(
     "Dev source file and dev target file have unequal number of lines")
 
     if args.model_name != "mle":
         if args.model_name == "word2word":
-            ml_train_input_lines, ml_train_output_lines, train_lines_record = preprocess(train_source_file_lines, train_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, args.context, args.input_writing_system)
-            ml_dev_input_lines, ml_dev_output_lines, dev_lines_record = preprocess(dev_source_file_lines, dev_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, args.context, args.input_writing_system)
+            # First make sure lines are word-aligned
+            ml_train_input_lines, ml_train_output_lines = aligned_lines(ml_train_input_lines, ml_train_output_lines)
+            ml_dev_input_lines, ml_dev_output_lines = aligned_lines(ml_dev_input_lines, ml_dev_output_lines)
+            # Preprocess
+            if args.preprocess:
+                ml_train_input_lines, ml_train_output_lines = preprocess(ml_train_input_lines, ml_train_output_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.input_writing_system)
+                ml_dev_input_lines, ml_dev_output_lines = preprocess(ml_dev_input_lines, ml_dev_output_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.input_writing_system)
+                # Again, making sure lines are word-aligned
+                ml_train_input_lines, ml_train_output_lines = aligned_lines(ml_train_input_lines, ml_train_output_lines)
+                ml_dev_input_lines, ml_dev_output_lines = aligned_lines(ml_dev_input_lines, ml_dev_output_lines)
+            # Context tagging
+            ml_train_input_lines, ml_train_output_lines, _ = tag(ml_train_input_lines, ml_train_output_lines, args.context, "train") 
+            ml_dev_input_lines, ml_dev_output_lines, _ = tag(ml_dev_input_lines, ml_dev_output_lines, args.context, "train") 
+            # Create temp files for training
             create_temp_input_output_files(ml_train_input_lines, ml_train_output_lines, ml_dev_input_lines, ml_dev_output_lines)
-            create_temp_line_record_files(train_lines_record, dev_lines_record)
             if args.include_fasttext:
-                #Preproces test input file for loading preword embeddings
-                ml_test_input_lines, _ = preprocess(test_source_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, args.context, args.input_writing_system)
+                #Preprocess TEST input file for loading preword embeddings
+                ml_test_input_lines = preprocess(ml_test_input_lines, [], False, True, args.alignment, None, args.copy_marker, args.input_writing_system)
                 list_to_file(ml_test_input_lines, f"temp/{args.model_name}_training_test_input")
         else:
-            ml_train_input_lines, ml_train_output_lines = preprocess(train_source_file_lines, train_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, None, args.input_writing_system)
-            ml_dev_input_lines, ml_dev_output_lines = preprocess(dev_source_file_lines, dev_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, None, args.input_writing_system)
+            # First make sure lines are word-aligned
+            if args.alignment == "word":
+                ml_train_input_lines, ml_train_output_lines = aligned_lines(ml_train_input_lines, ml_train_output_lines)
+                ml_dev_input_lines, ml_dev_output_lines = aligned_lines(ml_dev_input_lines, ml_dev_output_lines)
+            # Preprocess
+            if args.preprocess:
+                ml_train_input_lines, ml_train_output_lines = preprocess(ml_train_input_lines, ml_train_output_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.input_writing_system)
+                ml_dev_input_lines, ml_dev_output_lines = preprocess(ml_dev_input_lines, ml_dev_output_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.input_writing_system)
+                # Again, making sure lines are aligned after preprocessing
+                if args.alignment == "word":
+                    ml_train_input_lines, ml_train_output_lines = aligned_lines(ml_train_input_lines, ml_train_output_lines)
+                    ml_dev_input_lines, ml_dev_output_lines = aligned_lines(ml_dev_input_lines, ml_dev_output_lines)
+             # Create temp files for training
             create_temp_input_output_files(ml_train_input_lines, ml_train_output_lines, ml_dev_input_lines, ml_dev_output_lines)
             if args.include_fasttext:
-                #Preproces test input file for loading preword embeddings
-                ml_test_input_lines = preprocess(test_source_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, None, args.input_writing_system)
+                #Preproces TEST input file for loading preword embeddings
+                ml_test_input_lines = preprocess(ml_test_input_lines, [], False, True, args.alignment, None, args.copy_marker, args.input_writing_system)
                 list_to_file(ml_test_input_lines, f"temp/{args.model_name}_training_test_input")
 
         print("Starting Seq2Seq training")
@@ -442,7 +476,13 @@ if args.train:
     else:
         if args.alignment != "word":
             raise ValueError("MLE is only allowed for word-aligned lines")
-        ml_train_input_lines, ml_train_output_lines = preprocess(train_source_file_lines, train_target_file_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.model_name, None, args.input_writing_system)
+        # First make sure lines are word-aligned
+        ml_train_input_lines, ml_train_output_lines = aligned_lines(ml_train_input_lines, ml_train_output_lines)
+        ml_dev_input_lines, ml_dev_output_lines = aligned_lines(ml_dev_input_lines, ml_dev_output_lines)
+        # Preprocess
+        if args.preprocess:
+            ml_train_input_lines, ml_train_output_lines = preprocess(ml_train_input_lines, ml_train_output_lines, True, False, args.alignment, args.copy_unchanged_tokens, args.copy_marker, args.input_writing_system)
+        # Create temp files for training
         list_to_file(ml_train_input_lines, f"temp/{args.model_name}_training_train_input")
         list_to_file(ml_train_output_lines, f"temp/{args.model_name}_training_train_output")
 
@@ -453,27 +493,44 @@ if args.train:
         print("MLE training completed")
 
 if args.predict:
+    if args.model_name not in ["mle", "word2word", "line2line", "hybrid"]:
+        raise ValueError("Invalid model name. Can be only 'mle', 'word2word','line2line' or 'hybrid'")
+    # Open prediction input file
     predict_input_file = open(args.predict_input_file, "r")
-    predict_input_file_lines = predict_input_file.readlines()
+    ml_input_lines = predict_input_file.readlines()
     predict_input_file.close()
 
+    lines_record = None
     if args.model_name != "mle":
-        if args.model_name == "word2word":
-            ml_input_lines, lines_record = preprocess(predict_input_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, args.context, args.input_writing_system)
-            list_to_file(ml_input_lines, f"temp/{args.model_name}_prediction_ml_input")
-            list_to_file(lines_record, f"temp/{args.model_name}_prediction_lines_record")
+        if args.model_name == "hybrid":
+            if not args.mle_model_file or not args.word2word_model_dir: 
+                ValueError("Missing models for hybrid prediction. Please set --mle_model_file and --word2word_model_dir flags")
+            predict_hybrid()
         else:
-            ml_input_lines = preprocess(predict_input_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, None, args.input_writing_system)
+            if args.model_name == "word2word":
+                # Preprocess
+                if args.preprocess:
+                    ml_input_lines = preprocess(ml_input_lines, [], False, True, args.alignment, None, args.copy_marker, args.input_writing_system) 
+                # Context tagging
+                ml_input_lines, lines_record = tag(ml_input_lines, [], args.context, "predict")
+            else:
+                # Preprocess
+                if args.preprocess:
+                    ml_input_lines = preprocess(ml_input_lines, [], False, True, args.alignment, None, args.copy_marker, args.input_writing_system)
+            # Create temp file for prediction
             list_to_file(ml_input_lines, f"temp/{args.model_name}_prediction_ml_input")
 
-        print("Starting Seq2Seq prediction")
-        prediction_start_time = time.time()
-        predict_seq2seq()
-        total_prediction_time = time.time() - prediction_start_time
-        print("Seq2Seq prediction completed")
+            print("Starting Seq2Seq prediction")
+            prediction_start_time = time.time()
+            predict_seq2seq()
+            total_prediction_time = time.time() - prediction_start_time
+            print("Seq2Seq prediction completed")
 
     else:
-        ml_input_lines = preprocess(predict_input_file_lines, [], False, True, args.alignment, None, args.copy_marker, args.model_name, None, args.input_writing_system)
+        # Preprocess
+        if args.preprocess:
+            ml_input_lines = preprocess(ml_input_lines, [], False, True, args.alignment, None, args.copy_marker, args.input_writing_system)
+        # Create temp file for prediction
         list_to_file(ml_input_lines, f"temp/{args.model_name}_prediction_ml_input")
         mle_model = load_mle()
 
@@ -483,7 +540,8 @@ if args.predict:
         total_prediction_time = time.time() - prediction_start_time
         print("MLE prediction completed")
 
-    prediction_final_output = postprocess()
+    # Postprocess
+    prediction_final_output = postprocess(lines_record)
     list_to_file(prediction_final_output, args.predict_output_file)
 
 if args.evaluate_accuracy or args.evaluate_bleu:
