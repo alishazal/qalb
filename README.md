@@ -19,17 +19,17 @@ We ran our seq2seq systems with the GPU [NVIDIA Tesla V100 PCIe 32 GB](https://w
 # Repository Structure
 ```
 ai/
-    datasets/ #module that takes care of preprocessing of any dataset
-    models/ #contains the model architectures of the fasttext-enabled seq2seq (named char_seq2seq) and simple seq2seq models
-    tests/ #contains the scripts that run the seq2seq systems, MLE system, and also contains the accuracy and bleu score scripts.
-helpers/ #contains helper files for the transliterate.py script that runs complete systems
+    datasets/                   #module for preprocessing of any dataset
+    models/                     #contains the model architectures of the fasttext-enabled seq2seq (named char_seq2seq) and simple seq2seq models
+    tests/                      #contains the scripts that run the seq2seq systems, MLE system, and also contains the accuracy and bleu score scripts.
+helpers/                        #contains helper files for the transliterate.py script that runs complete systems
 output/
-    evaluations/ #folder to store evaluation txt files
-    models/ #folder to store trained models
-    predictions/ #folder to store predictions of trained systems
-pretrained_word_embeddings/ #folder to store word embedding .bin files that are produced by Fasttext
-splits_ldc/ #contains the LDC data split into train, dev and test; there is also a source split that contains unannotated arabizi data which we use to train Fasttext.
-temp/ #folder to store machine learning input and output files that are produced during systems runs. These files are produced after preprocessing or ay-normalization.
+    evaluations/                #folder to store evaluation txt files
+    models/                     #folder to store trained models
+    predictions/                #folder to store predictions of trained systems
+pretrained_word_embeddings/     #folder to store word embedding .bin files that are produced by Fasttext
+splits_ldc/                     #contains the LDC data split into train, dev and test; there is also a source split that contains unannotated arabizi data which we use to train Fasttext.
+temp/                           #folder to store machine learning input and output files that are produced during systems runs. These files are produced after preprocessing or ay-normalization.
 ```
 
 
