@@ -158,6 +158,7 @@ parser.add_argument('--restore', action="store", dest='restore', default=True, t
 
 args = parser.parse_args()
 
+#Takes a list and creates a file from it
 def list_to_file(input_list, file_name):
     f = open(file_name, "w")
     for line in input_list:
@@ -165,16 +166,20 @@ def list_to_file(input_list, file_name):
         f.write(line + "\n")
     f.close()
 
+# Create machine learning input and outputs files; these files are created after the raw input and output have been preprocessed
 def create_temp_input_output_files(ml_train_input_lines, ml_train_output_lines, ml_dev_input_lines, ml_dev_output_lines):
     list_to_file(ml_train_input_lines, f"temp/{args.model_name}_training_train_input")
     list_to_file(ml_train_output_lines, f"temp/{args.model_name}_training_train_output")
     list_to_file(ml_dev_input_lines, f"temp/{args.model_name}_training_dev_input")
     list_to_file(ml_dev_output_lines, f"temp/{args.model_name}_training_dev_output")
 
+# Store lines_record into files; lines_records are files that help in joining utterances after they have been broken by the context
+# window tagging feature
 def create_temp_line_record_files(train_lines_record, dev_lines_record):
     list_to_file(train_lines_record, f"temp/{args.model_name}_training_train_lines_record")
     list_to_file(dev_lines_record, f"temp/{args.model_name}_training_dev_lines_record")
 
+# Returns a string of flags that contain seq2seq hyperparameters
 def get_default_flags_string():
     return (f"--lr={args.lr} --batch_size={args.batch_size} --embedding_size={args.embedding_size} "
     f"--hidden_size={args.hidden_size} --rnn_layers={args.rnn_layers} --bidirectional_encoder={args.bidirectional_encoder} "
@@ -187,10 +192,12 @@ def get_default_flags_string():
     f"--max_sentence_length={args.max_sentence_length} --num_steps_per_eval={args.num_steps_per_eval} "
     f"--max_epochs={args.max_epochs} --restore={args.restore} ")
 
+# Converts a path to module. For example ai/tests/seq2seq.py would become ai.tests.seq2seq
 def convert_path_to_module(path):
     path = path.replace(".py", "")
     return path.replace("/", ".")
 
+# Run the command passed to the function and display output immediately 
 def run_command(cmd):
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     #start displaying output immediately
@@ -200,6 +207,7 @@ def run_command(cmd):
         sys.stdout.flush()
         if not line: break
 
+# This function generates and runs the command to run seq2seq training
 def train_seq2seq():
     if args.include_fasttext:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
@@ -219,6 +227,7 @@ def train_seq2seq():
 
     run_command(command)
 
+# This function generates and runs the command to predict from seq2seq moodels
 def predict_seq2seq():
     if args.include_fasttext:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
@@ -239,6 +248,7 @@ def predict_seq2seq():
 
     run_command(command)
 
+# Loads the MLE model into a dictionary; this dictionary is used for predictions
 def load_mle():
     model_file = open(args.model_output_path, "r")
     model_lines = model_file.readlines()
@@ -251,6 +261,7 @@ def load_mle():
 
     return model
 
+# This functions takes the lines record and output of the word2word system and turns them back into complete utterances
 def join_lines(output_files_lines, lines_record):
     new_pred_lines = []
     predFileLinesTracker = 0
@@ -266,12 +277,14 @@ def join_lines(output_files_lines, lines_record):
 
     return new_pred_lines
 
+# This function is part of postprocessing; it removes any [+] token predicted before a hashtag (foreign, emoji or punctuation)
 def remove_plus_before_foreign(line):
     for word in range(1, len(line)):
         if line[word] == "#" and "[+]" in line[word - 1]:
             line[word - 1] = line[word - 1].replace("[+]", "")
     return line
 
+# This function is part of postprocessing; it replaces system's output hashtags with the source words
 def replace_hashes_from_source(source_line, hashes_line):
     source_line = source_line.strip().split()
     hashes_line = hashes_line.strip().split()
@@ -280,6 +293,7 @@ def replace_hashes_from_source(source_line, hashes_line):
             hashes_line[i] = source_line[i]
     return " ".join(hashes_line)
 
+# Preprocessing function
 def postprocess():
     output_file = open(args.predict_output_file, "r")
     output_file_lines = output_file.readlines()
@@ -303,6 +317,7 @@ def postprocess():
 
     return output_file_lines
 
+# Function to calculate accuracy given a system output and gold
 def accuracy(system_output, gold):
     system_output_file = open(system_output, "r")
     system_output_file_lines = system_output_file.readlines()
@@ -333,6 +348,7 @@ def accuracy(system_output, gold):
                 total += 1
     return (correct/total)*100
 
+# Function to create ay-normalized files. We use them for ay-normalized accuracy and bleu score evaluation
 def create_ay_normalized_file(file, new_file):
     file = open(file, "r")
     file_lines = file.readlines()
@@ -351,12 +367,14 @@ def create_ay_normalized_file(file, new_file):
 
     list_to_file(normalized_lines, new_file) 
 
+# Calculates the bleu score given a system output and gold
 def evaluate_bleu(system_output, gold):
     cmd = f"perl ai/tests/bleu/multi-bleu.perl {gold} < {system_output}"
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     result = p.communicate()[0]
     return result.decode("utf-8")[7:12]
 
+# Creates the final version of the system output by removing [+] and [-] tokens
 def create_file_with_plus_minus_tokens_removed(system_output, new_file):
     system_output = open(system_output, "r")
     new_file = open(new_file, "w")
