@@ -257,19 +257,35 @@ def predict_seq2seq(predict_input_file, predict_output_file):
 
     run_command(command)
 
+# Gets segments (with context of +-1 word) of lines that have unknown words
 def get_segments_with_unknown_words(input_lines, unknown_line_numbers_list):
     unknown_segments = []
+    unknown_words_marker = []
     for line in range(len(unknown_line_numbers_list)):
         curr_input_line = input_lines[line].strip().split()
         if "1" in unknown_line_numbers_list[line]:
-            for num in range(1, len(unknown_line_numbers_list[line])):
+            for num in range(len(unknown_line_numbers_list[line])):
                 if unknown_line_numbers_list[line][num] == "1":
-                    curr_segment = [curr_input_line[num-1], curr_input_line[num]]
-                    if num != len(unknown_line_numbers_list[line]) - 1:
-                        curr_segment.append(curr_input_line[num+1])
+                    curr_segment = []
+                    curr_words_marker = []
+                    if num == 0 and len(unknown_line_numbers_list[line]) == 1:
+                        curr_segment.append(curr_input_line[num])
+                        curr_words_marker.append("1")
+                    elif num == 0 and len(unknown_line_numbers_list[line]) > 1:
+                        curr_segment.extend([curr_input_line[num], curr_input_line[num+1]])
+                        curr_words_marker.extend(["1", "0"])
+                    else:
+                        curr_segment = [curr_input_line[num-1], curr_input_line[num]]
+                        curr_words_marker = ["0", "1"]
+                        if num != len(unknown_line_numbers_list[line]) - 1:
+                            curr_segment.append(curr_input_line[num+1])
+                            curr_words_marker.append("0")
+                    
                     unknown_segments.append(" ".join(curr_segment))
-    return unknown_segments
+                    unknown_words_marker.extend(curr_words_marker)
+    return unknown_segments, unknown_words_marker
 
+# Combines the outputs of the mle and seq2seq outputs by replacing unknown words by seq2seq output and known words by mle output
 def combine_mle_seq2seq_outputs(mle_output, seq2seq_output, unknown_lines):
     final_output = []
     seq2seq_line_count = 0
@@ -286,18 +302,21 @@ def combine_mle_seq2seq_outputs(mle_output, seq2seq_output, unknown_lines):
         final_output.append(" ".join(newLine))
     return final_output
 
-def get_unknown_tagged_lines(tagged_lines):
+# Gets only those lines that have the unknown word
+def get_unknown_tagged_lines(tagged_lines, unknown_words_marker):
     output = []
-    for line in range(1, len(tagged_lines), 3):
-        output.append(tagged_lines[line])
+    for line in range(len(unknown_words_marker)):
+        if unknown_words_marker[line] == "1":
+            output.append(tagged_lines[line])
     return output
 
+# Function for hybrid prediction
 def predict_hybrid(mle_model, predict_input_lines, predict_output_file):
     unknown_line_numbers_list = predict_mle(mle_model, predict_input_lines, "temp/hybrid_mle_output", hybrid=True)
-    unknown_segments = get_segments_with_unknown_words(predict_input_lines, unknown_line_numbers_list)
+    unknown_segments, unknown_words_marker = get_segments_with_unknown_words(predict_input_lines, unknown_line_numbers_list)
     # Context tagging
     tagged_lines, _ = tag(unknown_segments, [], args.context, "predict")
-    ml_input_lines = get_unknown_tagged_lines(tagged_lines)
+    ml_input_lines = get_unknown_tagged_lines(tagged_lines, unknown_words_marker)
     # Create temp file for lines and run seq2seq on them
     list_to_file(ml_input_lines, "temp/hybrid_seq2seq_input")
     predict_seq2seq("temp/hybrid_seq2seq_input", "temp/hybrid_seq2seq_output")
