@@ -238,7 +238,7 @@ def train_seq2seq():
     run_command(command)
 
 # This function generates and runs the command to predict from seq2seq moodels
-def predict_seq2seq():
+def predict_seq2seq(predict_input_file, predict_output_file):
     if args.include_fasttext:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
         f"--train_input={args.prediction_loaded_model_training_train_input} "
@@ -247,23 +247,75 @@ def predict_seq2seq():
         f"--model_output_dir={args.model_output_path} "
         f"--fasttext_executable={args.fasttext_executable} "
         f"--word_embeddings={args.fasttext_bin_file} --train_word_embeddings={args.train_word_embeddings} "
-        f"--predict_input_file=temp/{args.model_name}_prediction_ml_input --predict_output_file={args.predict_output_file}")    
+        f"--predict_input_file={predict_input_file} --predict_output_file={predict_output_file}")    
     else:
         command = (f"python -m {convert_path_to_module(args.model_python_script)} "
         f"--train_input={args.prediction_loaded_model_training_train_input} "
         f"--train_output={args.prediction_loaded_model_training_train_output} --dev_input={args.prediction_loaded_model_training_dev_input} "
         f"--dev_output={args.prediction_loaded_model_training_dev_output} --model_output_dir={args.model_output_path} "
-        f"--predict_input_file=temp/{args.model_name}_prediction_ml_input " 
-        f"--predict_output_file={args.predict_output_file}")
+        f"--predict_input_file={predict_input_file} --predict_output_file={predict_output_file}")
 
     run_command(command)
 
-def predict_hybrid():
-    pass
+def get_segments_with_unknown_words(input_lines, unknown_line_numbers_list):
+    unknown_segments = []
+    for line in range(len(unknown_line_numbers_list)):
+        curr_input_line = input_lines[line].strip().split()
+        if "1" in unknown_line_numbers_list[line]:
+            for num in range(1, len(unknown_line_numbers_list[line])):
+                if unknown_line_numbers_list[line][num] == "1":
+                    curr_segment = [curr_input_line[num-1], curr_input_line[num]]
+                    if num != len(unknown_line_numbers_list[line]) - 1:
+                        curr_segment.append(curr_input_line[num+1])
+                    unknown_segments.append(" ".join(curr_segment))
+    return unknown_segments
+
+def combine_mle_seq2seq_outputs(mle_output, seq2seq_output, unknown_lines):
+    final_output = []
+    seq2seq_line_count = 0
+    for line in range(len(unknown_lines)):
+        curr_unknown_line = unknown_lines[line]
+        curr_mle_output_line = mle_output[line].strip().split()
+        newLine = []
+        for word in range(len(curr_unknown_line)):
+            if curr_unknown_line[word] == "0":
+                newLine.append(curr_mle_output_line[word])
+            else:
+                newLine.append(seq2seq_output[seq2seq_line_count].strip())
+                seq2seq_line_count += 1
+        final_output.append(" ".join(newLine))
+    return final_output
+
+def get_unknown_tagged_lines(tagged_lines):
+    output = []
+    for line in range(1, len(tagged_lines), 3):
+        output.append(tagged_lines[line])
+    return output
+
+def predict_hybrid(mle_model, predict_input_lines, predict_output_file):
+    unknown_line_numbers_list = predict_mle(mle_model, predict_input_lines, "temp/hybrid_mle_output", hybrid=True)
+    unknown_segments = get_segments_with_unknown_words(predict_input_lines, unknown_line_numbers_list)
+    # Context tagging
+    tagged_lines, _ = tag(unknown_segments, [], args.context, "predict")
+    ml_input_lines = get_unknown_tagged_lines(tagged_lines)
+    # Create temp file for lines and run seq2seq on them
+    list_to_file(ml_input_lines, "temp/hybrid_seq2seq_input")
+    predict_seq2seq("temp/hybrid_seq2seq_input", "temp/hybrid_seq2seq_output")
+    # Join the predicted seq2seq lines
+    seq2seq_output_file = open("temp/hybrid_seq2seq_output", "r")
+    seq2seq_output_file_lines = seq2seq_output_file.readlines()
+    seq2seq_output_file.close()
+    # Now combine the hybrid and seq2seq outputs to give a final output
+    mle_output_file = open("temp/hybrid_mle_output", "r")
+    mle_output_file_lines = mle_output_file.readlines()
+    mle_output_file.close()
+
+    combined_output = combine_mle_seq2seq_outputs(mle_output_file_lines, seq2seq_output_file_lines, unknown_line_numbers_list)
+    list_to_file(combined_output, predict_output_file)
 
 # Loads the MLE model into a dictionary; this dictionary is used for predictions
-def load_mle():
-    model_file = open(args.model_output_path, "r")
+def load_mle(path):
+    model_file = open(path, "r")
     model_lines = model_file.readlines()
     model_file.close()
 
@@ -505,7 +557,14 @@ if args.predict:
         if args.model_name == "hybrid":
             if not args.mle_model_file or not args.word2word_model_dir: 
                 ValueError("Missing models for hybrid prediction. Please set --mle_model_file and --word2word_model_dir flags")
-            predict_hybrid()
+            if args.preprocess:
+                    ml_input_lines = preprocess(ml_input_lines, [], False, True, args.alignment, None, args.copy_marker, args.input_writing_system) 
+            mle_model = load_mle(args.mle_model_file)
+            print("Starting Hybrid prediction")
+            prediction_start_time = time.time()
+            predict_hybrid(mle_model, ml_input_lines, args.predict_output_file)
+            total_prediction_time = time.time() - prediction_start_time
+            print("MLE Hybrid completed")
         else:
             if args.model_name == "word2word":
                 # Preprocess
@@ -522,7 +581,7 @@ if args.predict:
 
             print("Starting Seq2Seq prediction")
             prediction_start_time = time.time()
-            predict_seq2seq()
+            predict_seq2seq(f"temp/{args.model_name}_prediction_ml_input", args.predict_output_file)
             total_prediction_time = time.time() - prediction_start_time
             print("Seq2Seq prediction completed")
 
@@ -532,11 +591,11 @@ if args.predict:
             ml_input_lines = preprocess(ml_input_lines, [], False, True, args.alignment, None, args.copy_marker, args.input_writing_system)
         # Create temp file for prediction
         list_to_file(ml_input_lines, f"temp/{args.model_name}_prediction_ml_input")
-        mle_model = load_mle()
+        mle_model = load_mle(args.model_output_path)
 
         print("Starting MLE prediction")
         prediction_start_time = time.time()
-        predict_mle(mle_model, ml_input_lines, args.predict_output_file, "temp/mle_unknown.out")
+        predict_mle(mle_model, ml_input_lines, args.predict_output_file)
         total_prediction_time = time.time() - prediction_start_time
         print("MLE prediction completed")
 

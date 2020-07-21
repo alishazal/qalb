@@ -1,9 +1,9 @@
-def predict_mle(model, predict_input_file, predict_output_file, unknown_words_file):
+def predict_mle(model, predict_input_lines, predict_output_file, hybrid=False):
     predict_output_file = open(predict_output_file, "w")
-    unknown_words_file = open(unknown_words_file, "w") # this file will help in combining seq2seq with mle for the hybrid model
+    if hybrid: unknown_words = []
     
-    for line in range(len(predict_input_file)):
-        currLine = predict_input_file[line].strip().split()
+    for line in range(len(predict_input_lines)):
+        currLine = predict_input_lines[line].strip().split()
         ans = []
         unk = []
         for word in range(len(currLine)):
@@ -16,10 +16,10 @@ def predict_mle(model, predict_input_file, predict_output_file, unknown_words_fi
                 unk.append("1")
         ans = " ".join(ans)
         predict_output_file.write(ans + "\n")
-        unknown_words_file.write(" ".join(unk) + "\n")
+        if hybrid: unknown_words.append(unk)
 
     predict_output_file.close()
-    unknown_words_file.close()
+    if hybrid: return unknown_words
 
 def train_mle(train_input, train_output, model_output_path):
     model = {}
