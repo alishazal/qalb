@@ -193,6 +193,6 @@ python3 transliterate.py --predict_input_file=splits_ldc/test/test-source.arabiz
 python3 transliterate.py --model_name=mle --model_output_path=output/models/mle_model --predict_input_file=splits_ldc/test/test-source.arabizi --predict_output_file=output/predictions/mle-test.out --predict_output_word_aligned_gold=splits_ldc/test/test-word-aligned-target.gold --predict_output_sentence_aligned_gold=splits_ldc/test/test-sentence-aligned-target.gold --evaluation_results_file=output/evaluations/mle_test_evaluation_results.txt
 ```
 
-# Troublshooting
-## Tensor Shape Error on Word Embeddings: LHS not equal to RHS
+## Troubleshooting
+#### Tensor Shape Error on Word Embeddings: LHS not equal to RHS
 This error comes up when there is a difference in the files that the seq2seq model was trained on and the files that the model is told are "training" files during predictions. The model needs the same files in training and prediction because it has to load the same word embeddings everytime. If the files are different, the shape of the tensors won't match. So make sure that the files for the flags --prediction_loaded_model_training_train_input, --prediction_loaded_model_training_train_output, --prediction_loaded_model_training_dev_input, --prediction_loaded_model_training_dev_output, --prediction_loaded_model_training_test_input are the same files that were produced in temp during training. 
