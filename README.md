@@ -3,7 +3,7 @@ It is important to match the versions of the prerequisites mentioned below in or
 
 - Python 3.6 and its following libraries:
     - [camel-tools](https://camel-tools.readthedocs.io/en/latest/getting_started.html)
-    - tensorflow-gpu
+    - tensorflow-gpu 1.4.0
     - cudatoolkit 8.0
     - cudnn 6.0.21
     - editdistance
