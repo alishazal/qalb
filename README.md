@@ -1,3 +1,7 @@
+# Authors
+- Ali Shazal
+- Aiza Usman
+
 # Prerequisites
 It is important to match the versions of the prerequisites mentioned below in order to avoid errors. These prereqs assume you have a GPU. If you don't, ignore tensorflow-gpu (and instead install tensorflow), cudatoolkit 8.0, and cudnn 6.0.21.
 
