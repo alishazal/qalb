@@ -59,7 +59,7 @@ tf.app.flags.DEFINE_integer('num_steps_per_eval', 50, "Number of steps to wait"
 tf.app.flags.DEFINE_integer('max_epochs', 40, "Number of epochs to run"
                             " (0 = no limit).")
 tf.app.flags.DEFINE_string('predict_input_file', None, "Path to prediction input file")
-tf.app.flags.DEFINE_string('output_path', None, "Name of the output file with decoding results.")
+tf.app.flags.DEFINE_string('predict_output_file', None, "Name of the output file with decoding results.")
 tf.app.flags.DEFINE_boolean('restore', True, "Whether to restore the model.")
 tf.app.flags.DEFINE_string('model_output_dir', None, "Name of the output directory.")
 
@@ -290,7 +290,7 @@ def decode():
     print(
       "Restored model (global step {})".format(m.global_step.eval()),
       flush=True)
-    with io.open(FLAGS.output_path, 'w', encoding='utf-8') as output_file:
+    with io.open(FLAGS.predict_output_file, 'w', encoding='utf-8') as output_file:
       for line in lines:
         # if len(line) > max_length:
         #   continue
