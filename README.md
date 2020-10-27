@@ -43,7 +43,7 @@ There are 4 components of this tool. We will demostrate the use of each componen
 This readme also contains a repository structure at the end.
 
 ## 1. Data Extraction from LDC XML Files
-Download the [data](https://catalog.ldc.upenn.edu/LDC2017T07) and unzip the downloaded file. The annotated Arabizi-Arabic transliterated parallel corpus resides in bolt_sms_chat_ara_src_transliteration/data/transliteration as folder as xml files. We use these for training and testing of our tool. There are also unannotated Arabizi-only files in bolt_sms_chat_ara_src_transliteration/data/source; these are used for training word-embeddings using Fasttext.
+Download the [data](https://catalog.ldc.upenn.edu/LDC2017T07) and unzip the downloaded file.
 
 ### Extracting Data Splits: Train, Dev & Test
 
