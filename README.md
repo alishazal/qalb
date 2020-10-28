@@ -43,7 +43,7 @@ There are 4 components of this tool. We will demostrate the use of each componen
 This readme also contains a repository structure at the end.
 
 ## 1. Data Extraction from LDC XML Files
-Download the [data](https://catalog.ldc.upenn.edu/LDC2017T07) and unzip the downloaded file.
+Download the [data](https://catalog.ldc.upenn.edu/LDC2017T07) and unzip the downloaded file. After unzipping you will get the folder 'bolt_sms_chat_ara_src_transliteration' which will contain 'data' folder, 'docs' folder and 'index.html' file. Place the folder 'bolt_sms_chat_ara_src_transliteration' in the root of this repository.
 
 ### Extracting Data Splits: Train, Dev & Test
 
@@ -52,7 +52,7 @@ We split the chat and SMS transliteration files in the following way:
 - Dev: CHT_ARZ_{20120130.0000-20121226.0003} and SMS_ARZ_{20110705.0000-20120220.0000}
 - Test: CHT_ARZ_{20150101.0008-20160201.0001} and SMS_ARZ_{20130904.0001-20130929.0000}.
 
-You can find the exact files for each split in this repo in split_ldc folder. The files are train.txt, dev.txt, and test.txt. These txt files can be used to move the xml files of a specific split into a separate folder using the script makeNewLDCSplits.py in splits_ldc folder. 
+We have already written the exact files for each split in this repo in split_ldc folder. The files are train.txt, dev.txt, and test.txt. These txt files can be used to move the xml files of a specific split into a separate folder using the script splits_ldc/makeNewLDCSplits.py in the following way:
 
 1. To split the xml files into train, dev and test, run the following three commands (one command for each split):
 
@@ -67,7 +67,7 @@ python3 splits_ldc/makeSplits.py bolt_sms_chat_ara_src_transliteration/data/tran
 python3 splits_ldc/makeSplits.py bolt_sms_chat_ara_src_transliteration/data/transliteration/ splits_ldc/test.txt splits_ldc/test/xml_files
 ```
 
-Now the xml files for each split will reside in the specific folder of the split. Next, extract data from these XML files.
+Now the xml files for each split will reside in the specific folder of the split. Next, we will extract data from these XML files.
 
 2. Extract the source and target. To do this run the following three commands (one command for each split)
 
@@ -88,7 +88,7 @@ At this point in each of the split folders (train, dev and test) there will be t
 
 ### Extracting Unannotated Arabizi Data
 
-We also extract data from the unannotated Arabizi files. This data is used to train Fasttext for pre-trained word embeddings. The files include train, dev and test Arabizi lines and many more (they have ~1M word). However, in order to make sure that dev and test lines are unseen, we exclude them when extracting all lines. To do this, simply run the following command:
+We also extract data from the unannotated Arabizi files. This data is used to train Fasttext for pre-trained word embeddings. The files include train, dev and test Arabizi lines and many more (they have ~1M word). However, in order to make sure that dev and test lines are unseen, we exclude them when extracting all lines. To do all this, simply run the following command:
 
 ```unix
 python3 splits_ldc/getSourceArabiziWithoutDevAndTest.py bolt_sms_chat_ara_src_transliteration/data/source splits_ldc/dev/xml_files splits_ldc/test/xml_files splits_ldc/source/source-without-dev-test.arabizi
