@@ -1,8 +1,10 @@
-# Authors
-- Ali Shazal
-- Aiza Usman
+# Seq2Seq Transliteration Tool
 
-# Prerequisites
+## Authors
+- [Ali Shazal](https://github.com/alishazal)
+- [Aiza Usman](https://github.com/aizausman)
+
+## Prerequisites
 It is important to match the versions of the prerequisites mentioned below in order to avoid errors. These prereqs assume you have a GPU. If you don't, ignore tensorflow-gpu (and instead install tensorflow), cudatoolkit 8.0, and cudnn 6.0.21.
 
 - Python 3.6 and its following libraries:
@@ -20,7 +22,7 @@ It is important to match the versions of the prerequisites mentioned below in or
 
 We ran our seq2seq systems with the GPU [NVIDIA Tesla V100 PCIe 32 GB](https://www.techpowerup.com/gpu-specs/tesla-v100-pcie-32-gb.c3184) on NYU Abu Dhabi's High Performance Computing cluster, known as Dalma. We set the memory flag to 30GB and set the max. time to 12 hours for each run. All other Dalma flags were kept as default. The .sh scripts that we ran can be seen in the file dalma_scripts.sh
 
-# Repository Structure
+## Repository Structure
 ```
 ai/
     datasets/                   #module for preprocessing of any dataset
@@ -198,3 +200,6 @@ python3 transliterate.py --model_name=mle --model_output_path=output/models/mle_
 ## Troubleshooting
 #### Tensor Shape Error on Word Embeddings: LHS not equal to RHS
 This error comes up when there is a difference in the files that the seq2seq model was trained on and the files that the model is told are "training" files during predictions. The model needs the same files in training and prediction because it has to load the same word embeddings everytime. If the files are different, the shape of the tensors won't match. So make sure that the files for the flags --prediction_loaded_model_training_train_input, --prediction_loaded_model_training_train_output, --prediction_loaded_model_training_dev_input, --prediction_loaded_model_training_dev_output, --prediction_loaded_model_training_test_input are the same files that were produced in temp during training. 
+
+## License
+This tool is available under the MIT license. See the [LICENSE file](LICENSE) for more info.

@@ -1,4 +1,4 @@
-# Usage python accuracy.py [system-pred.out] [something.gold]
+''' Usage: python3 accuracy.py [system-pred.out] [something.gold] '''
 
 import sys
 
