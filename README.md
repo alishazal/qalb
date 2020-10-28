@@ -40,8 +40,6 @@ temp/                           #folder to store machine learning input and outp
 # Transliteration Tool
 There are 4 components of this tool. We will demostrate the use of each component using the [LDC BOLT Egyptian Arabic SMS/Chat and Transliteration](https://catalog.ldc.upenn.edu/LDC2017T07) data to transliterate Arabizi to Arabic.
 
-This readme also contains a repository structure at the end.
-
 ## 1. Data Extraction from LDC XML Files
 Download the [data](https://catalog.ldc.upenn.edu/LDC2017T07) and unzip the downloaded file. After unzipping you will get the folder 'bolt_sms_chat_ara_src_transliteration' which will contain 'data' folder, 'docs' folder and 'index.html' file. Place the folder 'bolt_sms_chat_ara_src_transliteration' in the root of this repository.
 
