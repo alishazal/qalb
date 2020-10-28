@@ -134,7 +134,7 @@ python3 transliterate.py --predict=False --evaluate_accuracy=False --evaluate_bl
 python3 transliterate.py --predict=False --evaluate_accuracy=False --evaluate_bleu=False --model_name=mle --model_output_path=output/models/mle_model
 ```
 
-To train on any other data, please look at the flags in transliterate.py and run the scripts by setting the appropriate flags for your data.
+**To train on any other data, please look at the flags in transliterate.py and run the scripts by setting the appropriate flags for your data.**
 
 ## 3. Prediction with Evaluation
 To predict the dev (or test) files using the trained models (with their temp files for word embeddings) and evaluate them using the gold files, run the following scripts according to your model prediction input/output files. To disable preprocessing set the --preprocess flag as False.
